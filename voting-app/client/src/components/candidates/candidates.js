@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-direct-mutation-state */
 /* eslint-disable no-undef */
@@ -13,7 +14,6 @@ import 'react-table/react-table.css';
 import 'react-notifications/lib/notifications.css';
 import FileReader from '../fileReader/fileReader';
 import InputID from '../inputID/inputID'
-import ConfirmButton from 'react-bootstrap-button-loader';
 
 const { encryptWithProof} = require('paillier-in-set-zkp')
 const paillier = require('paillier-js')
@@ -95,13 +95,15 @@ class Candidates extends Component{
                 axios.post('/voting-app/vote', vote)
                     .then(response => {
                         console.log(response);
+                        if(response.data == true){
+                            this.setState({isFinish: true});
+                            NotificationManager.success('Your vote is counted :-)', 'SUCCESS!');
+                        }
                     })
                     .catch(error => {
                         console.log(error);
                         NotificationManager.error('Your vote is not counted :-(', 'ERROR!');
                     })
-                this.setState({isFinish: true});
-                NotificationManager.success('Your vote is counted :-)', 'SUCCESS!');
             }
           );
     }

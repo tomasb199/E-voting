@@ -11,12 +11,9 @@ const ccp = JSON.parse(ccpJSON);
 
 const app = express();
 
+//Body Parser Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-function  init(){
-    
-}
 
 app.get('/voting-app/candidates', async (req, res) => {
     try {
@@ -50,6 +47,7 @@ app.get('/voting-app/candidates', async (req, res) => {
         res.json(JSON.parse(JSON.parse(result.toString())));
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
+        res.send(error);
         process.exit(1);
     }
 });
@@ -122,13 +120,14 @@ app.get('/voting-app/getBits', async (req, res) => {
         res.json(JSON.parse(JSON.parse(result.toString())));
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
+        res.status(500);
+        res.render('error', { error: err })
         process.exit(1);
     }
 });
 app.post('/voting-app/vote', async (req, res) => {
 
     console.log(req.body);
-    res.send(req.body);
     try {
 
         // Create a new file system based wallet for managing identities.
@@ -162,11 +161,12 @@ app.post('/voting-app/vote', async (req, res) => {
 		//console.log(JSON.stringify(vote));
         await contract.submitTransaction('createVote', JSON.stringify(req.body));
         console.log('Transaction has been submitted');
-
+        res.send(true);
         // Disconnect from the gateway.
         await gateway.disconnect();
     } catch (error) {
         console.error(`Failed to submit transaction: ${error}`);
+        res.send(error);
         process.exit(1);
     }
 });

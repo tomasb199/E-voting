@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 /* eslint-disable eqeqeq */
 /* eslint-disable no-trailing-spaces */
 /* eslint-disable indent */
@@ -11,12 +12,13 @@
 'use strict';
 
 const { Contract } = require('fabric-contract-api');
+const { verifyProof } = require('paillier-in-set-zkp');
 const paillier = require('paillier-js');
+var bigInt = require("big-integer");
 
 let PublicKey, PrivateKey;
-const validCandidates = [1, 1000, 1000000, 1000000000];
+let validCandidates;
 var bit = 512;
-var proof;
 class FabCar extends Contract {
 
     async initLedger(ctx) {
@@ -41,6 +43,10 @@ class FabCar extends Contract {
             await ctx.stub.putState('CANDIDATE' + i, Buffer.from(JSON.stringify(candidates[i])));
             console.info('Added <--> ', candidates[i]);
         }
+        validCandidates = candidates.map(function (obj) {
+            return obj.Vote;
+        });
+
 		await ctx.stub.putState('bits', Buffer.from(bit.toString()));
         await ctx.stub.putState('validCandidates', Buffer.from(JSON.stringify(validCandidates)));
     }
@@ -72,16 +78,33 @@ class FabCar extends Contract {
         return res;
     }
 
-	async createVote(ctx, vote) {
-        const voteToJSON = JSON.parse(vote);
+	async createVote(ctx, voteJSON) {
         /*const exists = await this.voteExists(ctx, voteId);
         if (exists) {
             throw new Error(`The vote ${voteId} already exists`);
         }
         const asset = { value };*/
-        const buffer = Buffer.from(JSON.stringify(voteToJSON));      
-        await ctx.stub.putState('VOTE' + voteToJSON.id, buffer);
-        return true;
+
+        const vote = JSON.parse(voteJSON);
+        const as = vote.Proof[0].map(proof => {
+        return bigInt(proof);
+        });
+        const es = vote.Proof[1].map(proof => {
+        return bigInt(proof);
+        });
+        const zs = vote.Proof[2].map(proof => {
+        return bigInt(proof);
+        });
+
+        if(verifyProof(PublicKey, bigInt(vote.Vote), [as, es, zs], validCandidates)){
+            const buffer = Buffer.from(JSON.stringify(vote));      
+            await ctx.stub.putState('VOTE' + vote.id, buffer);
+            return true;
+        }
+        else{
+            return false;
+        }
+        
     }
 
     async readVote(ctx, voteId) {

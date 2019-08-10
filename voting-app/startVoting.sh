@@ -10,17 +10,8 @@ set -e
 # don't rewrite paths for Windows Git Bash users
 export MSYS_NO_PATHCONV=1
 starttime=$(date +%s)
-CC_SRC_LANGUAGE=${1:-"javascript"}
-CC_SRC_LANGUAGE=`echo "$CC_SRC_LANGUAGE" | tr [:upper:] [:lower:]`
-elif [ "$CC_SRC_LANGUAGE" = "javascript" ]; then
-	CC_RUNTIME_LANGUAGE=node # chaincode runtime language is node.js
-	CC_SRC_PATH=/opt/gopath/src/github.com/fabcar/javascript
-else
-	echo The chaincode language ${CC_SRC_LANGUAGE} is not supported by this script
-	echo Supported chaincode languages are: go, javascript, and typescript
-	exit 1
-fi
-
+CC_RUNTIME_LANGUAGE=node # chaincode runtime language is node.js
+CC_SRC_PATH=/opt/gopath/src/github.com/fabcar/javascript
 
 # clean the keystore
 rm -rf ./hfc-key-store
