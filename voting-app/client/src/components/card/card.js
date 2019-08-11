@@ -1,14 +1,12 @@
-import React, {Component} from 'react';
+import React from 'react';
 
-class Card extends Component{
-
-    render(){
-        return(
-            <div class="card card-body bg-light">
-              <h5 class="card-title font-weight-bold">Welcome in voting app.</h5>
-              <p class="card-text">Choose one candidate and submit your vote.</p>
-            </div>
-        );
-    }
+const Card = (props) => {
+    
+    return(
+        <div class="card card-body bg-light">
+            <h5 class="card-title font-weight-bold">{props.title}</h5>
+            <p class="card-text">{props.text}</p>
+        </div>
+    );
 }
 export default Card;

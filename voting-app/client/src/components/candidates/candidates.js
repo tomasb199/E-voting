@@ -3,16 +3,17 @@
 /* eslint-disable react/no-direct-mutation-state */
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-expressions */
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import ReactTable from 'react-table';
-import {NotificationContainer, NotificationManager} from 'react-notifications';
-import {confirm} from "../confirmation/confirmation";
+import { NotificationContainer, NotificationManager } from 'react-notifications';
+import { confirm } from "../confirmation/confirmation";
 import axios from 'axios';
-import {CSVLink} from "react-csv";
+import { CSVLink } from "react-csv";
 import 'react-table/react-table.css';
 import 'react-notifications/lib/notifications.css';
-import FileReader from '../fileReader/fileReader';
+import { Redirect } from 'react-router-dom';
+
 import InputID from '../inputID/inputID'
 
 const { encryptWithProof} = require('paillier-in-set-zkp')
@@ -26,13 +27,14 @@ class Candidates extends Component{
         this.state = {
             pubKey: [],
             candidates: [],
-            vote: null,
-            voteName: '',
-            bits: null,
-            random: '',
-            isFinish: false,
-            id: null,
+            vote: undefined,
+            voteName: undefined,
+            bits: undefined,
+            random: undefined,
+            isFinish: undefined,
+            id: undefined,
             isSending: false,
+            isDowloaded: false,
         }
         this.handleOnClickVote = this.handleOnClickVote.bind(this);
         this.output = this.output.bind(this);
@@ -97,6 +99,7 @@ class Candidates extends Component{
                         console.log(response);
                         if(response.data == true){
                             this.setState({isFinish: true});
+                            this.state.isFinish = true;
                             NotificationManager.success('Your vote is counted :-)', 'SUCCESS!');
                         }
                     })
@@ -108,16 +111,11 @@ class Candidates extends Component{
           );
     }
 
-    handleForce = data => {
-        console.log(data);
+    output = (e) => {
+        e.preventDefault();
+        this.state.id = e.target.value;
+        console.log(e.target.value);
     };
-    output = data => {
-        this.state.id = data;
-        console.log(data);
-    };
-    addFile = event => {
-        console.log(event.target.files[0]);
-    }
 
     render(){
         const columns = [
@@ -181,7 +179,7 @@ class Candidates extends Component{
         
         return (
             <div>
-                <InputID func={this.output}/>
+                <InputID output={this.output}/>
                 <ReactTable
                     className="-striped -highlight"
                     defaultPageSize={5}
@@ -193,17 +191,23 @@ class Candidates extends Component{
                 <Button variant="success" onClick={this.handleOnClickVote}>Vote</Button>
                 {this.state.isFinish &&
                     <CSVLink
-                    data={this.state.random}
+                    data={this.state.id+"\n"+this.state.random}
                     filename={"my-file.csv"}
                     className="btn btn-info"
                     target="_blank"
-                  >
+                    //onClick={this.setState({isDowloaded: true})}
+                    >
                     Download me
                   </CSVLink>
                 }
-                {this.state.isFinish &&
-                <FileReader onFileLoaded={this.handleForce}/>
+                {this.state.isDowloaded &&
+                    <Redirect
+                    to={{
+                        pathname: "/verify"
+                    }}
+                    />
                 }
+                
                 <NotificationContainer/>
             </div>
             
