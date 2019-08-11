@@ -209,7 +209,7 @@ app.get('/voting-app/getResult', async (req, res) => {
 app.get('/voting-app/getVote', async (req, res) => {
 
     try {
-
+        console.log(req.query.ID);
         // Create a new file system based wallet for managing identities.
         const walletPath = path.join(process.cwd(), 'wallet');
         const wallet = new FileSystemWallet(walletPath);
@@ -234,8 +234,8 @@ app.get('/voting-app/getVote', async (req, res) => {
         const contract = network.getContract('fabcar');
 
         // Evaluate the specified transaction.
-        const result = await contract.evaluateTransaction('readVote', '1');
-        console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
+        const result = await contract.evaluateTransaction('readVote', req.query.ID.toString());
+        //console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
         res.json(JSON.parse(result.toString()));
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);

@@ -61,12 +61,12 @@ class Candidates extends Component{
 
     handleOnClickVote = () => {
         
-        if(this.state.vote == null){
+        if(this.state.vote == undefined){
             NotificationManager.error('Choose one candidate!', 'Your vote is empty');
             return;
         }
 
-        if(this.state.id == null){
+        if(this.state.id == undefined){
             NotificationManager.error('Enter your ID!', 'Your ID is empty');
             return;
         }
