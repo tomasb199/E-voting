@@ -11,6 +11,7 @@ const FileRead = ({
 
   const handleChangeFile = e => {
     let reader = new FileReader();
+    console.log(e.target.files);
     if (e.target.files.length > 0) {
       const filename = e.target.files[0].name;
 

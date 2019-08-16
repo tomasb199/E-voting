@@ -1,3 +1,5 @@
+/* eslint-disable react/style-prop-object */
+/* eslint-disable no-loop-func */
 /* eslint-disable eqeqeq */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-direct-mutation-state */
@@ -13,7 +15,9 @@ import { CSVLink } from "react-csv";
 import 'react-table/react-table.css';
 import 'react-notifications/lib/notifications.css';
 import { Redirect } from 'react-router-dom';
+import { ClipLoader } from 'react-spinners';
 
+import Spinner from '../loading-spinner/loading-spinner';
 import InputID from '../inputID/inputID'
 
 const { encryptWithProof} = require('paillier-in-set-zkp')
@@ -31,10 +35,14 @@ class Candidates extends Component{
             voteName: undefined,
             bits: undefined,
             random: undefined,
-            isFinish: undefined,
+            isFinish: false,
             id: undefined,
+            candidateID: undefined,
             isSending: false,
             isDowloaded: false,
+            validScores: [],
+            publicKey: undefined,
+            loading: false,
         }
         this.handleOnClickVote = this.handleOnClickVote.bind(this);
         this.output = this.output.bind(this);
@@ -45,12 +53,19 @@ class Candidates extends Component{
             method: "GET"})
             .then(res => res.json())
             .then(candidates => this.setState({candidates}, () => console.log('Candidates fetched..',
-            candidates)));
+            candidates),
+            this.state.validScores = candidates.map(function (obj) {
+                return obj.Record.Vote;
+            }
+            )));
         fetch('/voting-app/getPubKey/',{
             method: "GET"})
             .then(res => res.json())
             .then(pubKey => this.setState({pubKey}, () => console.log('Public Key fetched..',
-            pubKey)));
+            pubKey),
+            this.state.publicKey = new paillier.PublicKey(bigInt(pubKey.n), bigInt(pubKey.g)),
+            console.log(this.state.publicKey)
+            ));
         fetch('/voting-app/getBits/',{
             method: "GET"})
             .then(res => res.json())
@@ -70,30 +85,37 @@ class Candidates extends Component{
             NotificationManager.error('Enter your ID!', 'Your ID is empty');
             return;
         }
-        confirm('Are you sure vote - ' + this.state.voteName + '?').then(
+        confirm('Are you sure vote - ' + this.state.voteName + '?', 'OK', 'Back', 'Confimation your vote').then(
             () => {
-                var validScores = this.state.candidates.map(function (obj) {
-                    return obj.Record.Vote;
-                });
-                console.log(validScores);
+                this.state.loading = true;
+                console.log(this.state.publicKey.toString())
                 console.time('encrypt');
-        
-                const publicKey = new paillier.PublicKey(bigInt(this.state.pubKey.n), this.state.pubKey.g);
-                
-                const [cipher, proof, random] = encryptWithProof(publicKey, this.state.vote, validScores, this.state.bits);
+                var temp = false;
+                do{
+                    temp = false;
+                    var [cipher, proof, random] = encryptWithProof(this.state.publicKey, this.state.vote, this.state.validScores, this.state.bits);
+                    console.log(proof);
+                    proof.forEach( proof => {
+                        proof.forEach(element => {
+                            if(element < 0){
+                                temp = true;
+                            }
+                        });
+                    });
+                }while(temp);
+                console.timeEnd('encrypt');
                 console.log("Cipher: " + cipher);
                 console.log("Proof:" + proof);
                 console.log("Random:" + random);
                 this.setState({random: random.toString()});
                 this.state.random = random.toString();
-                console.timeEnd('encrypt');
                 var vote = {
                     id: this.state.id,
                     Vote: cipher,
                     Proof: proof 
                 }
                 console.log(this.state.voteName);
-        
+                console.time('verify');
                 axios.post('/voting-app/vote', vote)
                     .then(response => {
                         console.log(response);
@@ -101,12 +123,18 @@ class Candidates extends Component{
                             this.setState({isFinish: true});
                             this.state.isFinish = true;
                             NotificationManager.success('Your vote is counted :-)', 'SUCCESS!');
+                            console.timeEnd('verify');
+                        }
+                        else{
+
+                            NotificationManager.error('Your vote is not counted :-(', 'ERROR!');
                         }
                     })
                     .catch(error => {
                         console.log(error);
-                        NotificationManager.error('Your vote is not counted :-(', 'ERROR!');
+                        NotificationManager.error('Faild :-(', 'ERROR!');
                     })
+                    this.state.loading = false;
             }
           );
     }
@@ -117,7 +145,19 @@ class Candidates extends Component{
         console.log(e.target.value);
     };
 
+    handleDownload = () => {
+        console.log("TU!");
+        confirm('Are you want verify your vote?', 'OK', 'Back', 'Vote verify').then(
+        this.setState({isDowloaded: true})
+        )
+    }
+
     render(){
+        
+        const divStyle = {
+            fontWeight: 'bold',
+        };
+
         const columns = [
             {
                 Header: "Vote",
@@ -131,6 +171,7 @@ class Candidates extends Component{
                                 onClick={() =>{
                                     this.state.vote = props.original.Record.Vote;
                                     this.state.voteName = props.original.Record.Name;
+                                    this.state.candidateID = props.original.Record.ID;
                                 }}
                             /></label>
                         </div>
@@ -139,7 +180,8 @@ class Candidates extends Component{
                 sortable: false,
                 width: 75,
                 maxWidth:75,
-                minWidth:75
+                minWidth:75,
+                headerStyle: divStyle,
             },
             {
                 Header: "ID",
@@ -149,15 +191,16 @@ class Candidates extends Component{
                 },
                 width: 75,
                 maxWidth: 75,
-                minWidth: 75
+                minWidth: 75,
+                headerStyle: divStyle,
             },
             {
                 Header: "Name",
                 accessor: "Record.Name",
                 style:{
                     textAlign: "center"  
-                }
-                
+                },
+                headerStyle: divStyle,
             },
             {
                 Header: "Party",
@@ -165,7 +208,8 @@ class Candidates extends Component{
                 style:{
                     textAlign: "center"  
                 },
-                filterable: false
+                filterable: false,
+                headerStyle: divStyle,
             },
             {
                 Header: "Age",
@@ -174,11 +218,13 @@ class Candidates extends Component{
                     textAlign: "center"  
                 },
                 filterable: false,
+                headerStyle: divStyle,
             }
         ]
         
         return (
-            <div>
+            <div className='sweet-loading'>
+                
                 <InputID output={this.output}/>
                 <ReactTable
                     className="-striped -highlight"
@@ -188,14 +234,15 @@ class Candidates extends Component{
                     data={this.state.candidates}
                 >
                 </ReactTable>
-                <Button variant="success" onClick={this.handleOnClickVote}>Vote</Button>
+                <br/>
+                {!this.state.isFinish && <Button variant="success" onClick={this.handleOnClickVote}>Vote</Button>}
                 {this.state.isFinish &&
                     <CSVLink
                     data={this.state.id+"\n"+this.state.random}
                     filename={"my-file.csv"}
                     className="btn btn-info"
                     target="_blank"
-                    //onClick={this.setState({isDowloaded: true})}
+                    onClick={this.handleDownload}
                     >
                     Download me
                   </CSVLink>
@@ -207,7 +254,7 @@ class Candidates extends Component{
                     }}
                     />
                 }
-                
+                <Spinner show={this.state.loading}/>
                 <NotificationContainer/>
             </div>
             

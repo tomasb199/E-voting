@@ -11,6 +11,7 @@
 
 'use strict';
 
+const shim = require('fabric-shim');
 const { Contract } = require('fabric-contract-api');
 const { verifyProof } = require('paillier-in-set-zkp');
 const paillier = require('paillier-js');
@@ -18,12 +19,12 @@ var bigInt = require("big-integer");
 
 let PublicKey, PrivateKey;
 let validCandidates;
-var bit = 512;
+var bit = 1024;
 class FabCar extends Contract {
 
     async initLedger(ctx) {
         
-	var { publicKey, privateKey } = paillier.generateRandomKeys(bit); // Change to at least 2048 bits in production state
+	var { publicKey, privateKey } = await paillier.generateRandomKeys(bit); // Change to at least 2048 bits in production state
         //await ctx.stub.putState('PublicKey', Buffer.from(JSON.stringify(publicKey)));
         PublicKey = publicKey;
         PrivateKey = privateKey;
@@ -79,33 +80,63 @@ class FabCar extends Contract {
     }
 
 	async createVote(ctx, voteJSON) {
-        /*const exists = await this.voteExists(ctx, voteId);
-        if (exists) {
-            throw new Error(`The vote ${voteId} already exists`);
-        }
-        const asset = { value };*/
+        try{
+            const vote = JSON.parse(voteJSON);
+            const as = vote.Proof[0].map(proof => {
+            return bigInt(proof);
+            });
+            const es = vote.Proof[1].map(proof => {
+            return bigInt(proof);
+            });
+            const zs = vote.Proof[2].map(proof => {
+            return bigInt(proof);
+            });
 
-        const vote = JSON.parse(voteJSON);
-        const as = vote.Proof[0].map(proof => {
-        return bigInt(proof);
-        });
-        const es = vote.Proof[1].map(proof => {
-        return bigInt(proof);
-        });
-        const zs = vote.Proof[2].map(proof => {
-        return bigInt(proof);
-        });
-
-        if(verifyProof(PublicKey, bigInt(vote.Vote), [as, es, zs], validCandidates)){
-            const buffer = Buffer.from(JSON.stringify(vote));      
-            await ctx.stub.putState('VOTE' + vote.id, buffer);
-            return true;
+            if(verifyProof(PublicKey, bigInt(vote.Vote), [as, es, zs], validCandidates)){
+                const buffer = Buffer.from(JSON.stringify(vote));      
+                await ctx.stub.putState('VOTE' + vote.id, buffer);
+                return true;
+            }
+            else{
+                return false;
+            }
         }
-        else{
-            return false;
-        }
+        catch (err) {
+        return shim.error(err);
+      }
         
     }
+    //case with vote - 1/0 for all candidates => I need count all vote for all candidates, if sum is 1 = true, else = false 
+ /*   async createVote2(ctx, voteJSON) {
+        try{
+            const vote = JSON.parse(voteJSON);
+            
+            let result = 0;
+            for(let i = 0; i < vote.Vote.length; i++){
+                if(i > 0){
+                    result = publicKey.addition(result, vote.Vote[i]);
+                }
+                else{
+                    result = vote.Vote[i];
+                }
+            }
+            return  PrivateKey.decrypt(result);
+            /*
+            if(PrivateKey.decrypt(result) == 1){
+                const buffer = Buffer.from(JSON.stringify(vote));      
+                await ctx.stub.putState('VOTE' + vote.id, buffer);
+                return true;
+            }
+            else{
+                return false;
+            }
+            
+        }
+        catch (err) {
+        return shim.error(err);
+      }
+        
+    }*/
 
     async readVote(ctx, voteId) {
         const voteID_final = 'VOTE'+ voteId.toString();
@@ -153,7 +184,7 @@ class FabCar extends Contract {
     async queryAllVote(ctx) {
 
         const startKey = 'VOTE0';
-        const endKey = 'VOTE999';
+        const endKey = 'VOTE9999';
         const iterator = await ctx.stub.getStateByRange(startKey, endKey);
 
         const allResults = [];
@@ -185,31 +216,22 @@ class FabCar extends Contract {
 	
 	async countVote(ctx) {
 
-        var i = 1;
-        var vote = 0;
+        let vote = 0;
         var temp;
 
-        while(true){
-            const voteAsBytes = await ctx.stub.getState('VOTE' + i.toString()); // get the car from chaincode state
-            if (!voteAsBytes || voteAsBytes.length === 0) {
-                break;
-            }
-            const votes = JSON.parse(voteAsBytes.toString());
-            //if(verifyProof(PublicKey, candidates.Cipher, candidates.Proof, validCandidates, bit)){
-            if(i != 1){
-                
-                    temp = votes.Vote;
-                    console.info(temp);
-                    vote = PublicKey.addition(vote, temp.toString());
-                    
-                //vote += votes.Cipher;
+        const allVotes = JSON.parse(await this.queryAllVote(ctx));
+        
+        allVotes.forEach((element, i) => {
+            if(i != 0){
+                temp = element.Record.Vote;
+                console.info(temp);
+                vote = PublicKey.addition(vote, temp.toString());
             }
             else{
-                vote = votes.Vote;
+                vote = element.Record.Vote;
             }
-            //}
-            i++;
-        }
+        });
+        
         return  PrivateKey.decrypt(vote);
 
     }

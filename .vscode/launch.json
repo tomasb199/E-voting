@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/voting-app/client/node_modules/paillier-in-set-zkp/index.js"
+            "program": "${workspaceFolder}/voting-app/client/node_modules/paillier-js/paillier.js"
         }
     ]
 }

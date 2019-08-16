@@ -6,8 +6,8 @@ client:
     connection:
         timeout:
             peer:
-                endorser: '300'
-            orderer: '300'
+                endorser: '3000'
+            orderer: '3000'
 channels:
     mychannel:
         orderers:

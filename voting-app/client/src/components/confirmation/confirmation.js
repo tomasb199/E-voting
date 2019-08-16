@@ -27,16 +27,26 @@ class Confirmation extends React.Component {
           onHide={dismiss}
           backdrop={enableEscape ? true : "static"}
           keyboard={enableEscape}
+          style={{
+            //backgroundColor: "#92a8d1",
+          }}
         >
-          <ModalHeader>
+          <ModalHeader
+          style={{
+            //backgroundColor: "#92a8d1",
+            padding: "5px",
+          }}
+          >
             <Modal.Title>{title}</Modal.Title>
           </ModalHeader>
           <Modal.Body>{confirmation}</Modal.Body>
-          <ModalFooter>
+          <ModalFooter
+          style={{
+            justifyContent: "right"
+          }}
+          >
+             <Button variant="success" onClick={proceed}>{proceedLabel}</Button>
             <Button variant="danger" onClick={cancel}>{cancelLabel}</Button>
-            <Button variant="success" onClick={proceed}>
-              {proceedLabel}
-            </Button>
           </ModalFooter>
         </Modal>
       </div>
@@ -60,7 +70,7 @@ export function confirm(
   confirmation,
   proceedLabel = "OK",
   cancelLabel = "Back",
-  title = "Test",
+  title = "Confimation your vote",
   options = {}
 ) {
   return createConfirmation(confirmable(Confirmation))({

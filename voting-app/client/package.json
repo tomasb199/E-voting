@@ -14,9 +14,13 @@
     "react-confirm": "^0.1.18",
     "react-csv": "^1.1.1",
     "react-dom": "^16.8.6",
+    "react-loading-overlay": "^1.0.1",
+    "react-modal-dialog": "^4.0.7",
     "react-notifications": "^1.4.3",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
+    "react-spinjs": "^3.0.0",
+    "react-spinners": "^0.5.12",
     "react-table": "^6.10.0",
     "typescript": "^3.5.3"
   },
