@@ -9,6 +9,7 @@ class Spinner extends Component {
 
         const mystyle = {
             display: "flex",
+            margin: "auto",
             justifyContent: "center",
             alignItems: "center",
             };
@@ -25,7 +26,6 @@ class Spinner extends Component {
               onHide={dismiss}
               backdrop={enableEscape ? true : "static"}
               keyboard={enableEscape}
-              
             >
             <Modal.Header 
             style={{
@@ -34,10 +34,7 @@ class Spinner extends Component {
             }}
             />
             <Modal.Body 
-            style={{display: 'flex',
-                    justifyContent:'center',
-                    alignItems:'center',
-                    height: '25vh',
+            style={{
                     backgroundColor: '#ecf0f5'
             }}>
             <ClipLoader
@@ -46,6 +43,7 @@ class Spinner extends Component {
             size={150}
             color={'#36d7B7'}
             />
+            <h3 style={mystyle}>Wait please!</h3>
             </Modal.Body>
             <ModalFooter
             style={{

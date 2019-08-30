@@ -231,8 +231,13 @@ class FabCar extends Contract {
                 vote = element.Record.Vote;
             }
         });
-        
-        return  PrivateKey.decrypt(vote);
+        const sum = PrivateKey.decrypt(vote);
+        const allCandidates = JSON.parse(await this.queryAllCandidates(ctx));
+        let pom = allCandidates.length;
+        let res = allCandidates.map(function (obj) {
+            return sum.divide(obj.Record.Vote).mod(pom).toString();
+        });
+        return  res;
 
     }
 

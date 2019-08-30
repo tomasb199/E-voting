@@ -4,6 +4,11 @@ import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+//import axios from 'axios';
+
+//If I want to remember the token after closing the card or browser
+//const jwtToken = localStorage.getItem('JWT_TOKEN');
+//axios.defaults.headers.common['authorization'] = jwtToken;
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

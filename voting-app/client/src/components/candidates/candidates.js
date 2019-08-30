@@ -1,10 +1,5 @@
-/* eslint-disable react/style-prop-object */
-/* eslint-disable no-loop-func */
-/* eslint-disable eqeqeq */
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-direct-mutation-state */
-/* eslint-disable no-undef */
-/* eslint-disable no-unused-expressions */
+/* eslint-disable no-loop-func */
 import React, { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import ReactTable from 'react-table';
@@ -15,13 +10,12 @@ import { CSVLink } from "react-csv";
 import 'react-table/react-table.css';
 import 'react-notifications/lib/notifications.css';
 import { Redirect } from 'react-router-dom';
-import { ClipLoader } from 'react-spinners';
 
 import Spinner from '../loading-spinner/loading-spinner';
-import InputID from '../inputID/inputID'
+import InputID from '../inputID/inputID';
 
-const { encryptWithProof} = require('paillier-in-set-zkp')
-const paillier = require('paillier-js')
+const { encryptWithProof} = require('paillier-in-set-zkp');
+const paillier = require('paillier-js');
 var bigInt = require("big-integer");
 
 class Candidates extends Component{
@@ -49,43 +43,44 @@ class Candidates extends Component{
     }
 
     componentDidMount() {
-        fetch('/voting-app/candidates/',{
-            method: "GET"})
-            .then(res => res.json())
-            .then(candidates => this.setState({candidates}, () => console.log('Candidates fetched..',
-            candidates),
-            this.state.validScores = candidates.map(function (obj) {
+        axios.get('/voting-app/candidates/').then(response => response.data)
+        .then((candidates) => {
+            this.setState({ candidates })
+            console.log('Candidates:', this.state.candidates)
+            const validScores = candidates.map(function (obj) {
                 return obj.Record.Vote;
-            }
-            )));
-        fetch('/voting-app/getPubKey/',{
-            method: "GET"})
-            .then(res => res.json())
-            .then(pubKey => this.setState({pubKey}, () => console.log('Public Key fetched..',
-            pubKey),
-            this.state.publicKey = new paillier.PublicKey(bigInt(pubKey.n), bigInt(pubKey.g)),
-            console.log(this.state.publicKey)
-            ));
-        fetch('/voting-app/getBits/',{
-            method: "GET"})
-            .then(res => res.json())
-            .then(bits => this.setState({bits}, () => console.log('Number of bits fetched..',
-            bits)));
-        
+            })
+            this.setState({ validScores });
+            console.log('Valid scores: ', this.state.validScores)
+        });
+
+        axios.get('/voting-app/getPubKey/').then(response => response.data)
+        .then((pubKey) => {
+            this.setState({ pubKey })
+            const publicKey = new paillier.PublicKey(bigInt(pubKey.n), bigInt(pubKey.g))
+            this.setState({ publicKey });
+            console.log('Public Key:', this.state.publicKey)
+        });
+
+        axios.get('/voting-app/getBits/').then(response => response.data)
+        .then((bits) => {
+            this.setState({ bits })
+            console.log('Bits:', this.state.bits)
+        });
     }
 
-    handleOnClickVote = () => {
+    handleOnClickVote = async () => {
         
-        if(this.state.vote == undefined){
+        if(this.state.vote === undefined){
             NotificationManager.error('Choose one candidate!', 'Your vote is empty');
             return;
         }
 
-        if(this.state.id == undefined){
+        if(this.state.id === undefined){
             NotificationManager.error('Enter your ID!', 'Your ID is empty');
             return;
         }
-        confirm('Are you sure vote - ' + this.state.voteName + '?', 'OK', 'Back', 'Confimation your vote').then(
+        await confirm('Are you sure vote - ' + this.state.voteName + '?', 'OK', 'Back', 'Confimation your vote').then(
             () => {
                 this.state.loading = true;
                 console.log(this.state.publicKey.toString())
@@ -104,9 +99,6 @@ class Candidates extends Component{
                     });
                 }while(temp);
                 console.timeEnd('encrypt');
-                console.log("Cipher: " + cipher);
-                console.log("Proof:" + proof);
-                console.log("Random:" + random);
                 this.setState({random: random.toString()});
                 this.state.random = random.toString();
                 var vote = {
@@ -115,33 +107,37 @@ class Candidates extends Component{
                     Proof: proof 
                 }
                 console.log(this.state.voteName);
+                console.log(vote);
                 console.time('verify');
                 axios.post('/voting-app/vote', vote)
                     .then(response => {
                         console.log(response);
-                        if(response.data == true){
+                        if(response.data === true){
                             this.setState({isFinish: true});
                             this.state.isFinish = true;
+                            this.setState({loading: false});
                             NotificationManager.success('Your vote is counted :-)', 'SUCCESS!');
                             console.timeEnd('verify');
                         }
                         else{
 
                             NotificationManager.error('Your vote is not counted :-(', 'ERROR!');
+                            this.setState({loading: false});
                         }
                     })
                     .catch(error => {
                         console.log(error);
                         NotificationManager.error('Faild :-(', 'ERROR!');
+                        this.setState({loading: false});
                     })
-                    this.state.loading = false;
             }
           );
     }
 
     output = (e) => {
         e.preventDefault();
-        this.state.id = e.target.value;
+        const id = e.target.value;
+        this.setState({ id });
         console.log(e.target.value);
     };
 
@@ -166,7 +162,7 @@ class Candidates extends Component{
                 },
                 Cell: props =>{
                     return(
-                        <div class="radio">
+                        <div className="radio">
                             <label><input type="radio" name="optradio"
                                 onClick={() =>{
                                     this.state.vote = props.original.Record.Vote;

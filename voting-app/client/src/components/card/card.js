@@ -3,9 +3,9 @@ import React from 'react';
 const Card = (props) => {
     
     return(
-        <div class="card card-body bg-light">
-            <h5 class="card-title font-weight-bold">{props.title}</h5>
-            <p class="card-text">{props.text}</p>
+        <div className="card card-body bg-light">
+            <h5 className="card-title font-weight-bold">{props.title}</h5>
+            <p className="card-text">{props.text}</p>
         </div>
     );
 }

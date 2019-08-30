@@ -12,6 +12,7 @@ yarn-error.log*
 
 # Dependency directories
 wallet/
+node_modules
 
 # Optional npm cache directory
 .npm

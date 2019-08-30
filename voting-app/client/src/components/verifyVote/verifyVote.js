@@ -25,18 +25,21 @@ class VerifyVote extends Component{
     }
 
     componentDidMount() {
-        fetch('/voting-app/candidates/',{
-            method: "GET"})
-            .then(res => res.json())
-            .then(candidates => this.setState({candidates}, () => console.log('Candidates fetched..',
-            candidates)
-            ));
-        fetch('/voting-app/getPubKey/',{
-            method: "GET"})
-            .then(res => res.json())
-            .then(pubKey => this.setState({pubKey}, () => console.log('Public Key fetched..',
-            pubKey)
-            ));
+        axios.get('/voting-app/candidates/').then(response => response.data)
+        .then((candidates) => {
+            this.setState({ candidates })
+            console.log('Candidates:', this.state.candidates)
+            this.state.validScores = candidates.map(function (obj) {
+                return obj.Record.Vote;
+            })
+            console.log('Valid scores: ', this.state.validScores)
+        });
+
+        axios.get('/voting-app/getPubKey/').then(response => response.data)
+        .then((pubKey) => {
+            this.setState({ pubKey })
+            console.log('Public Key:', this.state.pubKey)
+        });
     }
 
     handleForce = data => {
@@ -105,7 +108,7 @@ class VerifyVote extends Component{
                 },
                 Cell: props =>{
                     return(
-                        <div class="radio">
+                        <div className="radio">
                             <label><input type="radio" name="optradio"
                                 onClick={() =>{
                                     this.state.currentVote = props.original.Record;
