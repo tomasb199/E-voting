@@ -9,10 +9,6 @@ import ChartsPage from './components/Chart/chart';
 import Error from './components/error/error'
 import { BrowserRouter, Route, Switch} from 'react-router-dom';
 import Login from './components/login/login';
-import axios from 'axios';
-
-const jwtToken = localStorage.getItem('JWT_TOKEN');
-axios.defaults.headers.common['authorization'] = jwtToken;
 
 const Vote = () => {
   return(

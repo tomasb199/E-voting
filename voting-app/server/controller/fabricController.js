@@ -40,7 +40,7 @@ module.exports = {
     vote: async (req, res) => {
     
         let networkObj = await network.connectToNetwork(appAdmin); //TODO:Change to req.body.id
-        //0console.log('util inspecting\n' + util.inspect(networkObj));
+        //console.log('util inspecting\n' + util.inspect(networkObj));
         
         let response = await network.invoke(networkObj, false, 'createVote', [req.body]);
         if (response.error) {
