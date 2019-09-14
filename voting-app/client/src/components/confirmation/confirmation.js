@@ -18,7 +18,7 @@ class Confirmation extends React.Component {
       proceed,
       dismiss,
       cancel,
-      enableEscape = true
+      enableEscape = false
     } = this.props;
     return (
       <div className="static-modal">
@@ -27,26 +27,36 @@ class Confirmation extends React.Component {
           onHide={dismiss}
           backdrop={enableEscape ? true : "static"}
           keyboard={enableEscape}
-          style={{
-            //backgroundColor: "#92a8d1",
-          }}
+          style={
+            {
+              //backgroundColor: "#92a8d1",
+            }
+          }
+          size="lg"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
         >
           <ModalHeader
-          style={{
-            //backgroundColor: "#92a8d1",
-            padding: "5px",
-          }}
+            closeButton
+            style={{
+              //backgroundColor: "#92a8d1",
+              padding: "5px"
+            }}
           >
             <Modal.Title>{title}</Modal.Title>
           </ModalHeader>
           <Modal.Body>{confirmation}</Modal.Body>
           <ModalFooter
-          style={{
-            justifyContent: "right"
-          }}
+            style={{
+              justifyContent: "right"
+            }}
           >
-             <Button variant="success" onClick={proceed}>{proceedLabel}</Button>
-            <Button variant="danger" onClick={cancel}>{cancelLabel}</Button>
+            <Button variant="success" onClick={proceed}>
+              {proceedLabel}
+            </Button>
+            <Button variant="danger" onClick={cancel}>
+              {cancelLabel}
+            </Button>
           </ModalFooter>
         </Modal>
       </div>

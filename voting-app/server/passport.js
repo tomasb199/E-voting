@@ -18,6 +18,7 @@ passport.use(new JwtStrategy({
     secretOrKey: config.JWT_SECRET
 }, async (payload, done) => {
     try {
+        console.log('Sub:', payload.sub);
         console.log('payload:', payload);
         done(null, true);
     } catch(error) {
@@ -38,6 +39,7 @@ passport.use('googleToken', new GooglePlusTokenStrategy({
         console.log('accessToken', accessToken);
         //console.log('refreshToken', refreshToken);
         var userData = {
+            id: profile.id,
             email: profile.emails[0].value,
             name: profile.displayName,
             token: accessToken

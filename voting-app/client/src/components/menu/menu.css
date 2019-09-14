@@ -1,0 +1,21 @@
+#menu {
+  align-items: center;
+}
+#verticalCenter {
+  text-align: center;
+  font-weight: bold;
+}
+
+#center {
+  margin-right: 35%;
+  margin-left: 35%;
+  margin-top: 10%;
+  margin-bottom: 10%;
+}
+
+#centerButtons {
+  margin-right: 30%;
+  margin-left: 30%;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
