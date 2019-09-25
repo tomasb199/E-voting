@@ -10,7 +10,6 @@ import Login from "./components/login/login";
 import Menu from "./components/menu/menu";
 import ProtectedRoute from "./authentication/protectedRoute";
 import "./App.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   return (
