@@ -1,8 +1,10 @@
-.inputfile {
-	width: 0.1px;
-	height: 0.1px;
-	opacity: 0;
-	overflow: hidden;
-	position: absolute;
-	z-index: -1;
+.myform {
+  padding: 10px 0px 10px 0px;
+}
+
+.photos {
+  border: 1px solid lightgray;
+  padding: black;
+  border-radius: 4px;
+  padding: 5px;
 }

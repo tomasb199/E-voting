@@ -3,7 +3,6 @@ class Auth {
     this.authenticated = false;
   }
 
-  //Current not in use
   login(cb) {
     this.authenticated = true;
     cb();

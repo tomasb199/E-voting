@@ -199,9 +199,15 @@ class VerifyVote extends Component {
           columns={columns}
           data={this.state.candidates}
         />
-        <Button variant="success" onClick={this.verify}>
-          Verify
-        </Button>
+        <br />
+        <div className="button-group">
+          <Button variant="success" className="success" onClick={this.verify}>
+            Verify
+          </Button>
+          <Button variant="danger" onClick={() => this.props.history.push("/")}>
+            Back
+          </Button>
+        </div>
         <NotificationContainer />
       </div>
     );

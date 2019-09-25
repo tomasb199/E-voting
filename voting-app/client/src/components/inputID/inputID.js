@@ -1,13 +1,17 @@
 /* eslint-disable no-lone-blocks */
-import React from 'react';
+import React from "react";
+import "./inputID.css";
 
-const InputID = (props) => {
-
-    return(
-        <div className="form-group">
-            <label htmlFor="ex2">Your ID</label>
-            <input type="number" className="ex2" id="ID" onChange={props.output}/>
-        </div>
-    );
-}
+const InputID = props => {
+  return (
+    <div class="form-inline inputID">
+      <b>Your ID</b>
+      <input
+        type="number"
+        className="form-control col-md-2"
+        onChange={props.output}
+      />
+    </div>
+  );
+};
 export default InputID;

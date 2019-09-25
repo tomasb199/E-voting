@@ -31,24 +31,31 @@ class FabCar extends Contract {
                 ID: "1",
                 Name: "Robert Fico",
                 Description: "SMER-SD",
+                Foto:
+                    "https://upload.wikimedia.org/wikipedia/commons/7/7c/Fico_Juncker_%28cropped%29.jpg",
                 Age: "45"
             },
             {
                 ID: "2",
                 Name: "Marian Kotleba",
                 Description: "LSNS",
+                Foto:
+                    "https://cdn.webnoviny.sk/sites/32/2017/10/marian-kotleba-676x451.jpg",
                 Age: "88"
             },
             {
                 ID: "3",
                 Name: "Bela Bugar",
                 Description: "MOST-HID",
+                Foto:
+                    "https://www.most-hid.sk/sites/most-hid.sk/files/story/bugar-bela.jpg",
                 Age: "42"
             },
             {
                 ID: "4",
                 Name: "Tomas Bujna",
                 Description: "FIIT",
+                Foto: "https://i.imgur.com/UQihxU0.jpg",
                 Age: "24"
             }
         ];

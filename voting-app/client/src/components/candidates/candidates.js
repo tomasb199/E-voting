@@ -17,6 +17,7 @@ import { Redirect } from "react-router-dom";
 import Spinner from "../loading-spinner/loading-spinner";
 import InputID from "../inputID/inputID";
 import Card from "../card/card";
+import "./candidates.css";
 
 const { encryptWithProof } = require("paillier-in-set-zkp");
 const paillier = require("paillier-js");
@@ -175,55 +176,77 @@ class Candidates extends Component {
       {
         Header: "Vote",
         style: {
-          textAlign: "center"
+          textAlign: "center",
+          padding: "40px 0"
         },
         Cell: props => {
           return (
-            <div className="radio">
-              <label>
-                <input
-                  type="radio"
-                  name="optradio"
-                  onClick={() => {
-                    this.state.vote = props.original.Record.Vote;
-                    this.state.voteName = props.original.Record.Name;
-                    this.state.candidateID = props.original.Record.ID;
-                  }}
-                />
-              </label>
+            <div className="radio align-middle">
+              <input
+                type="radio"
+                name="optradio"
+                onClick={() => {
+                  this.state.vote = props.original.Record.Vote;
+                  this.state.voteName = props.original.Record.Name;
+                  this.state.candidateID = props.original.Record.ID;
+                }}
+              />
             </div>
           );
         },
         sortable: false,
-        width: 75,
         maxWidth: 75,
-        minWidth: 75,
         headerStyle: divStyle
       },
       {
         Header: "ID",
         accessor: "Record.ID",
         style: {
+          textAlign: "center",
+          padding: "40px 0"
+        },
+        maxWidth: 75,
+        headerStyle: divStyle
+      },
+      {
+        Header: "Photo",
+        style: {
           textAlign: "center"
         },
-        width: 75,
-        maxWidth: 75,
-        minWidth: 75,
+        Cell: props => {
+          return (
+            <div>
+              <img
+                src={props.original.Record.Foto}
+                width="100"
+                height="100"
+                className="photos"
+                alt=""
+              />
+            </div>
+          );
+        },
+        sortable: false,
+        maxWidth: 200,
+        minWidth: 110,
         headerStyle: divStyle
       },
       {
         Header: "Name",
         accessor: "Record.Name",
         style: {
-          textAlign: "center"
+          textAlign: "center",
+          padding: "40px 0"
         },
         headerStyle: divStyle
       },
+
       {
         Header: "Party",
         accessor: "Record.Description",
         style: {
-          textAlign: "center"
+          textAlign: "center",
+          padding: "40px 0"
         },
         filterable: false,
         headerStyle: divStyle
@@ -232,58 +255,64 @@ class Candidates extends Component {
         Header: "Age",
         accessor: "Record.Age",
         style: {
-          textAlign: "center"
+          textAlign: "center",
+          padding: "45px 0"
         },
+        maxWidth: 200,
         filterable: false,
         headerStyle: divStyle
       }
     ];
 
     return (
-      <div id="page-content">
-        <div>
+      <div className="myform">
+        <Card
+          title="Welcome in voting app."
+          text="Choose one candidate and submit your vote."
+        />
+        <div className="sweet-loading">
+          <InputID output={this.output} />
+          <ReactTable
+            className="-striped -highlight"
+            defaultPageSize={5}
+            minRows={1}
+            columns={columns}
+            data={this.state.candidates}
+          ></ReactTable>
           <br />
-          <Card
-            title="Welcome in voting app."
-            text="Choose one candidate and submit your vote."
-          />
-          <br />
-          <div className="sweet-loading">
-            <InputID output={this.output} />
-            <ReactTable
-              className="-striped -highlight"
-              defaultPageSize={5}
-              minRows={1}
-              columns={columns}
-              data={this.state.candidates}
-            ></ReactTable>
-            <br />
-            {!this.state.isFinish && (
+          {!this.state.isFinish && (
+            <div className="button-group">
               <Button variant="success" onClick={this.handleOnClickVote}>
                 Vote
               </Button>
-            )}
-            {this.state.isFinish && (
-              <CSVLink
-                data={this.state.id + "\n" + this.state.random}
-                filename={"my-file.csv"}
-                className="btn btn-info"
-                target="_blank"
-                onClick={this.handleDownload}
+              <Button
+                variant="danger"
+                onClick={() => this.props.history.push("/")}
               >
-                Download me
-              </CSVLink>
-            )}
-            {this.state.isDowloaded && (
-              <Redirect
-                to={{
-                  pathname: "/verify"
-                }}
-              />
-            )}
-            <Spinner show={this.state.loading} />
-            <NotificationContainer />
-          </div>
+                Back
+              </Button>
+            </div>
+          )}
+          {this.state.isFinish && (
+            <CSVLink
+              data={this.state.id + "\n" + this.state.random}
+              filename={"my-file.csv"}
+              className="btn btn-info"
+              target="_blank"
+              onClick={this.handleDownload}
+            >
+              Download me
+            </CSVLink>
+          )}
+          {this.state.isDowloaded && (
+            <Redirect
+              to={{
+                pathname: "/verify"
+              }}
+            />
+          )}
+          <Spinner show={this.state.loading} />
+          <NotificationContainer />
         </div>
       </div>
     );

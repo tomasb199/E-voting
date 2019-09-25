@@ -1,7 +1,36 @@
-#App-header {
-    padding: 10px;
-    text-align: center;
-    background: #1abc9c;
-    color: white;
-    font-size: 30px;
+.App-header {
+  background: #1abc9c;
+  color: white;
+  align-items: center;
+  margin: auto;
+}
+
+.logo {
+  margin: 5px;
+  border: 3px solid lightgray;
+  border-radius: 20px;
+}
+
+.title {
+  color: aliceblue;
+  margin: auto;
+  text-align: center;
+  align-items: center;
+}
+
+.logout {
+  margin: auto;
+  text-align: right;
+  align-items: center;
+}
+
+.link {
+  margin-left: 15px;
+  color: white;
+  font-size: 24px;
+}
+
+.logo-title {
+  align-items: center;
+  display: flex;
 }
