@@ -19,7 +19,6 @@ import InputID from "../inputID/inputID";
 import Card from "../card/card";
 import "./candidates.css";
 
-const { encryptWithProof } = require("paillier-in-set-zkp");
 const paillier = require("paillier-js");
 var bigInt = require("big-integer");
 
@@ -27,18 +26,13 @@ class Candidates extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pubKey: [],
       candidates: [],
-      vote: undefined,
+      verifyCandidates: [],
       voteName: undefined,
-      bits: undefined,
-      random: undefined,
       isFinish: false,
       id: undefined,
       candidateID: undefined,
-      isSending: false,
       isDowloaded: false,
-      validScores: [],
       publicKey: undefined,
       loading: false
     };
@@ -48,23 +42,18 @@ class Candidates extends Component {
 
   componentDidMount() {
     axios
-      .get("/voting-app/candidates/")
+      .get("http://localhost:8000/voting-app/candidates/")
       .then(response => response.data)
       .then(candidates => {
         this.setState({ candidates });
         console.log("Candidates:", this.state.candidates);
-        const validScores = candidates.map(function(obj) {
-          return obj.Record.Vote;
-        });
-        this.setState({ validScores });
-        console.log("Valid scores: ", this.state.validScores);
       });
 
     axios
-      .get("/voting-app/getPubKey/")
+      .get("http://localhost:8000/voting-app/getPubKey/")
       .then(response => response.data)
-      .then(pubKey => {
-        this.setState({ pubKey });
+      .then(pubKeyJSON => {
+        const pubKey = JSON.parse(pubKeyJSON);
         const publicKey = new paillier.PublicKey(
           bigInt(pubKey.n),
           bigInt(pubKey.g)
@@ -73,17 +62,10 @@ class Candidates extends Component {
         console.log("Public Key:", this.state.publicKey);
       });
 
-    axios
-      .get("/voting-app/getBits/")
-      .then(response => response.data)
-      .then(bits => {
-        this.setState({ bits });
-        console.log("Bits:", this.state.bits);
-      });
   }
 
   handleOnClickVote = async () => {
-    if (this.state.vote === undefined) {
+    if (this.state.candidateID === undefined) {
       NotificationManager.error("Choose one candidate!", "Your vote is empty");
       return;
     }
@@ -98,50 +80,67 @@ class Candidates extends Component {
       "Back",
       "Confimation your vote"
     ).then(() => {
-      this.state.loading = true;
-      console.log(this.state.publicKey.toString());
+      this.setState({ loading: true });
+      console.log("HE Public key:", this.state.publicKey.toString());
       console.time("encrypt");
-      var temp = false;
-      do {
-        temp = false;
-        var [cipher, proof, random] = encryptWithProof(
-          this.state.publicKey,
-          this.state.vote,
-          this.state.validScores,
-          this.state.bits
-        );
-        console.log(proof);
-        proof.forEach(proof => {
-          proof.forEach(element => {
-            if (element < 0) {
-              temp = true;
-            }
-          });
-        });
-      } while (temp);
+      let vote = this.state.candidates.map(candidate => {
+        if (candidate.Record.ID === this.state.candidateID) {
+          var [cipher, rand] = this.state.publicKey.encrypt(1);
+          this.state.verifyCandidates.push(rand);
+          candidate.vote = cipher;
+          return candidate;
+        } else {
+          [cipher, rand] = this.state.publicKey.encrypt(0);
+          this.state.verifyCandidates.push(rand);
+          candidate.vote = cipher;
+          return candidate;
+        }
+      });
       console.timeEnd("encrypt");
-      this.setState({ random: random.toString() });
-      this.state.random = random.toString();
-      var vote = {
-        id: this.state.id,
-        Vote: cipher,
-        Proof: proof
+      vote = {
+        Vote: vote
       };
-      console.log(this.state.voteName);
-      console.log(vote);
+      //Verify vote first
       console.time("verify");
       axios
-        .post("/voting-app/vote", vote)
+        .post("http://localhost:5000/verifyVote", vote)
         .then(response => {
-          console.log(response);
-          if (response.data === true) {
-            /*this.setState({ isFinish: true });
-            this.state.isFinish = true;*/
-            this.setState({ loading: false });
-            NotificationManager.success("Your vote is counted :-)", "SUCCESS!");
+          if (response.data !== false) {
+            NotificationManager.success(
+              "Your vote was success signed :-)",
+              "SUCCESS!"
+            );
             console.timeEnd("verify");
+            const finalVote = response.data;
+            finalVote.id = this.state.id;
+            console.time("sendVote");
+            //Then send signed vote
+            axios
+              .post("http://localhost:8000/voting-app/vote", finalVote)
+              .then(response => {
+                console.log("Final Vote:", finalVote);
+                console.timeEnd("sendVote");
+                if (response.data === true) {
+                  /*this.setState({ isFinish: true });
+                  this.state.isFinish = true;*/
+                  NotificationManager.success(
+                    "Your vote is counted :-)",
+                    "SUCCESS!"
+                  );
+                  this.setState({ loading: false });
+                } else {
+                  NotificationManager.error(
+                    "Your vote is not counted :-(",
+                    "ERROR!"
+                  );
+                  this.setState({ loading: false });
+                }
+              });
           } else {
-            NotificationManager.error("Your vote is not counted :-(", "ERROR!");
+            NotificationManager.error(
+              "Your vote is not sign from VS :-(",
+              "ERROR!"
+            );
             this.setState({ loading: false });
           }
         })
@@ -161,7 +160,6 @@ class Candidates extends Component {
   };
 
   handleDownload = () => {
-    console.log("TU!");
     confirm("Are you want verify your vote?", "OK", "Back", "Vote verify").then(
       this.setState({ isDowloaded: true })
     );
@@ -295,7 +293,11 @@ class Candidates extends Component {
           )}
           {this.state.isFinish && (
             <CSVLink
-              data={this.state.id + "\n" + this.state.random}
+              data={
+                this.state.id +
+                "\n" +
+                JSON.stringify(this.state.verifyCandidates)
+              }
               filename={"my-file.csv"}
               className="btn btn-info"
               target="_blank"

@@ -8,21 +8,11 @@
 
 const shim = require("fabric-shim");
 const { Contract } = require("fabric-contract-api");
-const { verifyProof } = require("paillier-in-set-zkp");
 const paillier = require("paillier-js");
 var bigInt = require("big-integer");
 
-let PublicKey, PrivateKey;
-let validCandidates;
-var bit = 1024;
-let sizeElectionDistrict = 1000;
 class FabCar extends Contract {
     async initLedger(ctx) {
-        var { publicKey, privateKey } = await paillier.generateRandomKeys(bit); // Change to at least 2048 bits in production state
-        //await ctx.stub.putState('PublicKey', Buffer.from(JSON.stringify(publicKey)));
-        PublicKey = publicKey;
-        PrivateKey = privateKey;
-
         console.info("\n\nTesting additive homomorphism\n");
 
         console.info("============= START : Initialize Ledger ===========");
@@ -60,13 +50,6 @@ class FabCar extends Contract {
             }
         ];
 
-        // Generate voting keys
-        validCandidates = candidates.map((c, i) => {
-            let vote = sizeElectionDistrict ** i;
-            c.Vote = vote;
-            return vote;
-        });
-
         for (let i = 0; i < candidates.length; i++) {
             candidates[i].docType = "candidates";
             await ctx.stub.putState(
@@ -76,11 +59,8 @@ class FabCar extends Contract {
             console.info("Added <--> ", candidates[i]);
         }
 
-        await ctx.stub.putState("bits", Buffer.from(bit.toString()));
-        await ctx.stub.putState(
-            "validCandidates",
-            Buffer.from(JSON.stringify(validCandidates))
-        );
+        //await ctx.stub.putState("bits", Buffer.from(bit.toString()));
+
     }
 
     async dataExists(ctx, voteId) {
@@ -88,22 +68,6 @@ class FabCar extends Contract {
         return !!buffer && buffer.length > 0;
     }
 
-    async getKey(ctx) {
-        return JSON.stringify(PublicKey);
-    }
-
-    /*    async getCan(ctx) {
-        const exists = await this.dataExists(ctx, "validCandidates");
-        if (!exists) {
-            throw new Error("The bits does not exist");
-        }
-
-        const buffer = await ctx.stub.getState("validCandidates");
-        const asset = JSON.parse(buffer.toString());
-
-        return asset;
-    }
-*/
     async getBits(ctx) {
         const exists = await this.dataExists(ctx, "bits");
         if (!exists) {
@@ -115,33 +79,34 @@ class FabCar extends Contract {
         return res;
     }
 
+    async getVotingKey(ctx) {
+
+        const exists = await this.dataExists(ctx, "HEPublicKey");
+        if (!exists) {
+            throw new Error(`The Voting Key does not exist`);
+        }
+
+        const carAsBytes = await ctx.stub.getState("HEPublicKey"); // get the car from chaincode state
+        console.log(carAsBytes.toString());
+        return carAsBytes.toString();
+    }
+
+    async sendVotingKey(ctx, publicKey) {
+
+        const key = JSON.parse(publicKey);
+        await ctx.stub.putState(
+            "HEPublicKey",
+            Buffer.from(JSON.stringify(key))
+        );
+        return true;
+    }
+
     async createVote(ctx, voteJSON) {
         try {
             const vote = JSON.parse(voteJSON);
-            const as = vote.Proof[0].map(proof => {
-                return bigInt(proof);
-            });
-            const es = vote.Proof[1].map(proof => {
-                return bigInt(proof);
-            });
-            const zs = vote.Proof[2].map(proof => {
-                return bigInt(proof);
-            });
-
-            if (
-                verifyProof(
-                    PublicKey,
-                    bigInt(vote.Vote),
-                    [as, es, zs],
-                    validCandidates
-                )
-            ) {
-                const buffer = Buffer.from(JSON.stringify(vote));
-                await ctx.stub.putState("VOTE" + vote.id, buffer);
-                return true;
-            } else {
-                return false;
-            }
+            const buffer = Buffer.from(JSON.stringify(vote));
+            await ctx.stub.putState("VOTE" + vote.id, buffer);
+            return true;
         } catch (err) {
             return shim.error(err);
         }
@@ -222,37 +187,30 @@ class FabCar extends Contract {
     }
 
     async countVote(ctx) {
-        let vote = 0;
-        var temp;
-
         const allVotes = JSON.parse(await this.queryAllVote(ctx));
-
-        // Cipfer sum of all votes
-        allVotes.forEach((element, i) => {
-            if (i !== 0) {
-                temp = element.Record.Vote;
-                console.info(temp);
-                vote = PublicKey.addition(vote, temp.toString());
-            } else {
-                vote = element.Record.Vote;
+        const publicKeyTemp = JSON.parse(await this.getVotingKey(ctx));
+        const PublicKey = new paillier.PublicKey(
+            bigInt(publicKeyTemp.n),
+            bigInt(publicKeyTemp.g)
+        );
+        let res = [];
+        //Pocet kandidatov
+        for (let y = 0; y < allVotes[0].Record.Vote.length; y++) {
+            let temp = 0;
+            //Idem cez vsetky hlasy
+            for (let x = 0; x < allVotes.length; x++) {
+                if (x !== 0) {
+                    temp = PublicKey.addition(
+                        temp,
+                        allVotes[x].Record.Vote[y].vote.toString()
+                    );
+                } else {
+                    temp = allVotes[x].Record.Vote[y].vote;
+                }
             }
-        });
+            res.push(temp);
+        }
 
-        // Decrypt sum of all votes
-        const sum = PrivateKey.decrypt(vote);
-
-        // Parse sum of all votes to for each candidate
-        const allCandidates = JSON.parse(await this.queryAllCandidates(ctx));
-        let res = allCandidates.map(function(obj, i, array) {
-            if (i + 1 < array.length) {
-                return sum
-                    .mod(array[i + 1].Record.Vote) //TODO: potreba zmenit na nasledujucu hodnotu
-                    .divide(obj.Record.Vote)
-                    .toString();
-            } else {
-                return sum.divide(obj.Record.Vote).toString();
-            }
-        });
         return res;
     }
 }

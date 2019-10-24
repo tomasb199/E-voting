@@ -14,10 +14,10 @@ class ChartsPage extends Component {
 
   async componentDidMount() {
     axios
-      .get("/voting-app/candidates/")
+      .get("http://localhost:8000/voting-app/candidates/")
       .then(response => response.data)
       .then(candidates => {
-        const labels = candidates.map(function(obj) {
+        const labels = candidates.map(function (obj) {
           return obj.Record.Name;
         });
         this.setState({ labels });
@@ -25,7 +25,7 @@ class ChartsPage extends Component {
       });
 
     axios
-      .get("/voting-app/getResult/")
+      .get("http://localhost:5000/getResult")
       .then(response => response.data)
       .then(result => {
         this.setState({ result });
@@ -35,31 +35,31 @@ class ChartsPage extends Component {
 
   render() {
     const dataBar = {
-        labels: this.state.labels,
-        datasets: [
-          {
-            label: "sum of Votes",
-            data: this.state.result,
-            backgroundColor: [
-              "rgba(255, 134,159,0.4)",
-              "rgba(98,  182, 239,0.4)",
-              "rgba(255, 218, 128,0.4)",
-              "rgba(113, 205, 205,0.4)",
-              "rgba(170, 128, 252,0.4)",
-              "rgba(255, 177, 101,0.4)"
-            ],
-            borderWidth: 2,
-            borderColor: [
-              "rgba(255, 134, 159, 1)",
-              "rgba(98,  182, 239, 1)",
-              "rgba(255, 218, 128, 1)",
-              "rgba(113, 205, 205, 1)",
-              "rgba(170, 128, 252, 1)",
-              "rgba(255, 177, 101, 1)"
-            ]
-          }
-        ]
-      },
+      labels: this.state.labels,
+      datasets: [
+        {
+          label: "sum of Votes",
+          data: this.state.result,
+          backgroundColor: [
+            "rgba(255, 134,159,0.4)",
+            "rgba(98,  182, 239,0.4)",
+            "rgba(255, 218, 128,0.4)",
+            "rgba(113, 205, 205,0.4)",
+            "rgba(170, 128, 252,0.4)",
+            "rgba(255, 177, 101,0.4)"
+          ],
+          borderWidth: 2,
+          borderColor: [
+            "rgba(255, 134, 159, 1)",
+            "rgba(98,  182, 239, 1)",
+            "rgba(255, 218, 128, 1)",
+            "rgba(113, 205, 205, 1)",
+            "rgba(170, 128, 252, 1)",
+            "rgba(255, 177, 101, 1)"
+          ]
+        }
+      ]
+    },
       barChartOptions = {
         responsive: true,
         maintainAspectRatio: true,

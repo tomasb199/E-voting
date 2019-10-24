@@ -11,20 +11,15 @@ const passportJWT = passport.authenticate('jwt', { session: false });
 router.route('/voting-app/candidates')
     .get(FabricController.candidates);
 
+// Only for debug
 router.route('/voting-app/getAllVote')
     .get(FabricController.getAllVote);
 
 router.route('/voting-app/getPubKey')
     .get(FabricController.getPubKey);
 
-router.route('/voting-app/getBits')
-    .get(FabricController.getBits);
-
 router.route('/voting-app/vote')
     .post(FabricController.vote);
-
-router.route('/voting-app/getResult')
-    .get(FabricController.getResult);
 
 router.route('/voting-app/getVote')
     .get(FabricController.getVote);
