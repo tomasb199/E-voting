@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const paillier = require("paillier-js");
+const paillier = require('paillier-bignum');
 let r = require("jsrsasign");
 let network = require("./fabric/network");
 
@@ -20,9 +20,14 @@ const appAdmin = "admin";
 //Function for init voting keys
 async function init() {
   //use this identity to query
-  let { publicKey, privateKey } = paillier.generateRandomKeys(bits);
+  let { publicKey, privateKey } = await paillier.generateRandomKeys(bits);
   signKey = new r.KEYUTIL.generateKeypair("RSA", 2048);
   PrivateKey = privateKey;
+
+  const publicKeyObj = {
+    n: publicKey.n.toString(),
+    g: publicKey.g.toString(),
+  }
 
   //insert Public Key
   let networkObj = await network.connectToNetwork(appAdmin);
@@ -30,7 +35,7 @@ async function init() {
     networkObj,
     false,
     "sendVotingKey",
-    JSON.stringify(publicKey)
+    JSON.stringify(publicKeyObj)
   );
   networkObj = await network.connectToNetwork(appAdmin);
   response = await network.invoke(networkObj, false, "sendSigningKey", r.KEYUTIL.getPEM(signKey.pubKeyObj));
@@ -48,7 +53,7 @@ async function countVote(res) {
   votingResult = JSON.parse(response);
   console.log("RESULT: ", votingResult);
   decryptVotingResult = votingResult.map(element => {
-    return PrivateKey.decrypt(element);
+    return PrivateKey.decrypt(element).toString();
   });
   res.send(decryptVotingResult);
 }

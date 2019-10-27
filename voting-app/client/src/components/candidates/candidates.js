@@ -60,7 +60,6 @@ class Candidates extends Component {
         this.setState({ publicKey });
         console.log("Public Key:", this.state.publicKey);
       });
-
   }
 
   handleOnClickVote = async () => {

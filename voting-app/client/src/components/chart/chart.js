@@ -38,13 +38,6 @@ class ChartsPage extends Component {
 
   render() {
 
-    const mystyle = {
-      display: "flex",
-      margin: "auto",
-      justifyContent: "center",
-      alignItems: "center"
-    };
-
     const dataBar = {
       labels: this.state.labels,
       datasets: [

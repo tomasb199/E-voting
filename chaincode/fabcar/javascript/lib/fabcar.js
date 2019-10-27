@@ -11,7 +11,6 @@ const { Contract } = require("fabric-contract-api");
 const paillier = require("paillier-js");
 let r = require("jsrsasign");
 var bigInt = require("big-integer");
-//var publicKey = undefined;
 
 class FabCar extends Contract {
     async initLedger(ctx) {
@@ -201,7 +200,7 @@ class FabCar extends Contract {
         try {
             const allVotes = JSON.parse(await this.queryAllVote(ctx));
             const publicKeyTemp = JSON.parse(await this.getVotingKey(ctx));
-            const PublicKey = new paillier.PublicKey(
+            var PublicKey = new paillier.PublicKey(
                 bigInt(publicKeyTemp.n),
                 bigInt(publicKeyTemp.g)
             );
@@ -227,7 +226,7 @@ class FabCar extends Contract {
 
         } catch (error) {
             console.info(error);
-            return [];
+            return JSON.stringify(PublicKey);
         }
     }
 }
