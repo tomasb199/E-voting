@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Bar } from "react-chartjs-2";
 import { MDBContainer } from "mdbreact";
+import Spinner from "../loading-spinner/loading-spinner";
 import axios from "axios";
 
 class ChartsPage extends Component {
@@ -8,7 +9,8 @@ class ChartsPage extends Component {
     super(props);
     this.state = {
       result: [],
-      labels: []
+      labels: [],
+      loading: true
     };
   }
 
@@ -29,11 +31,20 @@ class ChartsPage extends Component {
       .then(response => response.data)
       .then(result => {
         this.setState({ result });
+        this.setState({ loading: false });
         console.log("Result:", this.state.result);
       });
   }
 
   render() {
+
+    const mystyle = {
+      display: "flex",
+      margin: "auto",
+      justifyContent: "center",
+      alignItems: "center"
+    };
+
     const dataBar = {
       labels: this.state.labels,
       datasets: [
@@ -88,10 +99,15 @@ class ChartsPage extends Component {
       };
 
     return (
-      <MDBContainer>
-        <h3 className="mt-5">Voting result</h3>
-        <Bar data={dataBar} options={barChartOptions} />
-      </MDBContainer>
+      <div>
+        {!this.state.loading && (
+          <MDBContainer>
+            <h3 className="mt-5">Voting result</h3>
+            <Bar data={dataBar} options={barChartOptions} />
+          </MDBContainer>
+        )}
+        <Spinner show={this.state.loading} />
+      </div>
     );
   }
 }

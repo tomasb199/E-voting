@@ -52,8 +52,7 @@ class Candidates extends Component {
     axios
       .get("http://localhost:8000/voting-app/getPubKey/")
       .then(response => response.data)
-      .then(pubKeyJSON => {
-        const pubKey = JSON.parse(pubKeyJSON);
+      .then(pubKey => {
         const publicKey = new paillier.PublicKey(
           bigInt(pubKey.n),
           bigInt(pubKey.g)

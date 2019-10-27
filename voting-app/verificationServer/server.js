@@ -6,7 +6,7 @@ let r = require("jsrsasign");
 let network = require("./fabric/network");
 
 const port = 5000;
-const bits = 32;
+const bits = 2048;
 
 const app = express();
 
@@ -16,6 +16,7 @@ app.use(bodyParser.json());
 var PrivateKey = undefined, signKey = undefined;
 app.use(cors()); //Cors for use 2 API
 const appAdmin = "admin";
+
 //Function for init voting keys
 async function init() {
   //use this identity to query
@@ -31,6 +32,9 @@ async function init() {
     "sendVotingKey",
     JSON.stringify(publicKey)
   );
+  networkObj = await network.connectToNetwork(appAdmin);
+  response = await network.invoke(networkObj, false, "sendSigningKey", r.KEYUTIL.getPEM(signKey.pubKeyObj));
+
 }
 
 async function countVote(res) {
@@ -42,25 +46,13 @@ async function countVote(res) {
     ""
   );
   votingResult = JSON.parse(response);
+  console.log("RESULT: ", votingResult);
   decryptVotingResult = votingResult.map(element => {
     return PrivateKey.decrypt(element);
   });
   res.send(decryptVotingResult);
 }
 init();
-
-// Test for verify function
-function verifySign(vote, hSigVal) {
-  console.log("Data to verify", vote);
-  var pubKey = r.KEYUTIL.getKey(r.KEYUTIL.getPEM(signKey.pubKeyObj));
-  console.log(pubKey.verify(vote, hSigVal));
-}
-
-//Routes
-app.get("/getSignPublicKey", (req, res) => {
-  console.log(r.KEYUTIL.getPEM(signKey.pubKeyObj));
-  res.send(r.KEYUTIL.getPEM(signKey.pubKeyObj));
-});
 
 app.get("/getResult", (req, res) => {
   countVote(res);
@@ -97,9 +89,7 @@ app.post("/verifyVote", (req, res) => {
       sig.init(signKey.prvKeyObj);
       sig.updateString(JSON.stringify(vote));
       console.log("Data to sign", JSON.stringify(vote));
-      var hSigVal = sig.sign();
-      fullVote.Sign = hSigVal;
-      verifySign(JSON.stringify(vote), hSigVal);
+      fullVote.Sign = sig.sign();
       res.send(fullVote);
     } else {
       res.send(false);

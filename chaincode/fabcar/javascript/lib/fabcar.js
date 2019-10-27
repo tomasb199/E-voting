@@ -9,12 +9,13 @@
 const shim = require("fabric-shim");
 const { Contract } = require("fabric-contract-api");
 const paillier = require("paillier-js");
+let r = require("jsrsasign");
 var bigInt = require("big-integer");
+//var publicKey = undefined;
 
 class FabCar extends Contract {
     async initLedger(ctx) {
         console.info("\n\nTesting additive homomorphism\n");
-
         console.info("============= START : Initialize Ledger ===========");
         const candidates = [
             {
@@ -59,24 +60,11 @@ class FabCar extends Contract {
             console.info("Added <--> ", candidates[i]);
         }
 
-        //await ctx.stub.putState("bits", Buffer.from(bit.toString()));
-
     }
 
     async dataExists(ctx, voteId) {
         const buffer = await ctx.stub.getState(voteId);
         return !!buffer && buffer.length > 0;
-    }
-
-    async getBits(ctx) {
-        const exists = await this.dataExists(ctx, "bits");
-        if (!exists) {
-            throw new Error("The bits does not exist");
-        }
-
-        const bits = await ctx.stub.getState("bits");
-        const res = bits.toString();
-        return res;
     }
 
     async getVotingKey(ctx) {
@@ -88,25 +76,47 @@ class FabCar extends Contract {
 
         const carAsBytes = await ctx.stub.getState("HEPublicKey"); // get the car from chaincode state
         console.log(carAsBytes.toString());
-        return carAsBytes.toString();
+        return JSON.parse(carAsBytes.toString());
     }
 
     async sendVotingKey(ctx, publicKey) {
 
         const key = JSON.parse(publicKey);
-        await ctx.stub.putState(
-            "HEPublicKey",
-            Buffer.from(JSON.stringify(key))
-        );
+        await ctx.stub.putState("HEPublicKey", Buffer.from(JSON.stringify(key)));
+        return true;
+    }
+
+    async getSigningKey(ctx) {
+
+        const exists = await this.dataExists(ctx, "SigningPublicKey");
+        if (!exists) {
+            throw new Error("The SigningPublicKey does not exist");
+        }
+
+        const bits = await ctx.stub.getState("SigningPublicKey");
+        const res = JSON.parse(bits.toString());
+        return res;
+    }
+
+    async sendSigningKey(ctx, publicKeyJSON) {
+
+        await ctx.stub.putState("SigningPublicKey", Buffer.from(publicKeyJSON));
         return true;
     }
 
     async createVote(ctx, voteJSON) {
         try {
+            var pubKey = new r.KEYUTIL.getKey(await this.getSigningKey(ctx));
             const vote = JSON.parse(voteJSON);
-            const buffer = Buffer.from(JSON.stringify(vote));
-            await ctx.stub.putState("VOTE" + vote.id, buffer);
-            return true;
+
+            if (pubKey.verify(JSON.stringify(vote.Vote), vote.Sign)) {
+                const buffer = Buffer.from(JSON.stringify(vote));
+                await ctx.stub.putState("VOTE" + vote.id, buffer);
+                return true;
+            }
+            else {
+                return false;
+            }
         } catch (err) {
             return shim.error(err);
         }
@@ -187,31 +197,38 @@ class FabCar extends Contract {
     }
 
     async countVote(ctx) {
-        const allVotes = JSON.parse(await this.queryAllVote(ctx));
-        const publicKeyTemp = JSON.parse(await this.getVotingKey(ctx));
-        const PublicKey = new paillier.PublicKey(
-            bigInt(publicKeyTemp.n),
-            bigInt(publicKeyTemp.g)
-        );
-        let res = [];
-        //Pocet kandidatov
-        for (let y = 0; y < allVotes[0].Record.Vote.length; y++) {
-            let temp = 0;
-            //Idem cez vsetky hlasy
-            for (let x = 0; x < allVotes.length; x++) {
-                if (x !== 0) {
-                    temp = PublicKey.addition(
-                        temp,
-                        allVotes[x].Record.Vote[y].vote.toString()
-                    );
-                } else {
-                    temp = allVotes[x].Record.Vote[y].vote;
-                }
-            }
-            res.push(temp);
-        }
 
-        return res;
+        try {
+            const allVotes = JSON.parse(await this.queryAllVote(ctx));
+            const publicKeyTemp = JSON.parse(await this.getVotingKey(ctx));
+            const PublicKey = new paillier.PublicKey(
+                bigInt(publicKeyTemp.n),
+                bigInt(publicKeyTemp.g)
+            );
+            let res = [];
+            //Pocet kandidatov
+            for (let y = 0; y < allVotes[0].Record.Vote.length; y++) {
+                let temp = 0;
+                //Idem cez vsetky hlasy
+                for (let x = 0; x < allVotes.length; x++) {
+                    if (x !== 0) {
+                        temp = PublicKey.addition(
+                            temp,
+                            allVotes[x].Record.Vote[y].vote.toString()
+                        );
+                    } else {
+                        temp = allVotes[x].Record.Vote[y].vote;
+                    }
+                }
+                res.push(temp);
+            }
+
+            return res;
+
+        } catch (error) {
+            console.info(error);
+            return [];
+        }
     }
 }
 

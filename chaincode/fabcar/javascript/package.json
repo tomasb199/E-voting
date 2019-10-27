@@ -19,6 +19,8 @@
     "dependencies": {
         "fabric-contract-api": "~1.4.0",
         "fabric-shim": "~1.4.0",
+        "jsrsasign": "^8.0.12",
+        "paillier-bignum": "^1.2.1",
         "paillier-in-set-zkp": "^0.9.0",
         "paillier-js": "^0.9.2"
     },
@@ -26,7 +28,7 @@
         "chai": "^4.1.2",
         "eslint": "^4.19.1",
         "mocha": "^5.2.0",
-        "nyc": "^12.0.2",
+        "nyc": "^14.1.1",
         "sinon": "^6.0.0",
         "sinon-chai": "^3.2.0"
     },
