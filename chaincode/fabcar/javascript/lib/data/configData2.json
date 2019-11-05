@@ -1,0 +1,190 @@
+{
+    "voteType": 2,
+    "maxVote": 3,
+    "candidate": [
+        {
+            "ID": "1",
+            "Party": "SMER-SD",
+            "Candidates": [
+                {
+                    "ID": 1,
+                    "Name": "Candidat1"
+                },
+                {
+                    "ID": 2,
+                    "Name": "Candidat2"
+                },
+                {
+                    "ID": 3,
+                    "Name": "Candidat3"
+                },
+                {
+                    "ID": 4,
+                    "Name": "Candidat4"
+                },
+                {
+                    "ID": 5,
+                    "Name": "Candidat5"
+                },
+                {
+                    "ID": 6,
+                    "Name": "Candidat6"
+                },
+                {
+                    "ID": 7,
+                    "Name": "Candidat7"
+                },
+                {
+                    "ID": 8,
+                    "Name": "Candidat8"
+                },
+                {
+                    "ID": 9,
+                    "Name": "Candidat9"
+                },
+                {
+                    "ID": 10,
+                    "Name": "Candidat10"
+                }
+            ]
+        },
+        {
+            "ID": "2",
+            "Party": "LSNS",
+            "Candidates": [
+                {
+                    "ID": 1,
+                    "Name": "Candidat1"
+                },
+                {
+                    "ID": 2,
+                    "Name": "Candidat2"
+                },
+                {
+                    "ID": 3,
+                    "Name": "Candidat3"
+                },
+                {
+                    "ID": 4,
+                    "Name": "Candidat4"
+                },
+                {
+                    "ID": 5,
+                    "Name": "Candidat5"
+                },
+                {
+                    "ID": 6,
+                    "Name": "Candidat6"
+                },
+                {
+                    "ID": 7,
+                    "Name": "Candidat7"
+                },
+                {
+                    "ID": 8,
+                    "Name": "Candidat8"
+                },
+                {
+                    "ID": 9,
+                    "Name": "Candidat9"
+                },
+                {
+                    "ID": 10,
+                    "Name": "Candidat10"
+                }
+            ]
+        },
+        {
+            "ID": "3",
+            "Party": "MOST-HID",
+            "Candidates": [
+                {
+                    "ID": 1,
+                    "Name": "Candidat1"
+                },
+                {
+                    "ID": 2,
+                    "Name": "Candidat2"
+                },
+                {
+                    "ID": 3,
+                    "Name": "Candidat3"
+                },
+                {
+                    "ID": 4,
+                    "Name": "Candidat4"
+                },
+                {
+                    "ID": 5,
+                    "Name": "Candidat5"
+                },
+                {
+                    "ID": 6,
+                    "Name": "Candidat6"
+                },
+                {
+                    "ID": 7,
+                    "Name": "Candidat7"
+                },
+                {
+                    "ID": 8,
+                    "Name": "Candidat8"
+                },
+                {
+                    "ID": 9,
+                    "Name": "Candidat9"
+                },
+                {
+                    "ID": 10,
+                    "Name": "Candidat10"
+                }
+            ]
+        },
+        {
+            "ID": "4",
+            "Party": "FIIT",
+            "Candidates": [
+                {
+                    "ID": 1,
+                    "Name": "Candidat1"
+                },
+                {
+                    "ID": 2,
+                    "Name": "Candidat2"
+                },
+                {
+                    "ID": 3,
+                    "Name": "Candidat3"
+                },
+                {
+                    "ID": 4,
+                    "Name": "Candidat4"
+                },
+                {
+                    "ID": 5,
+                    "Name": "Candidat5"
+                },
+                {
+                    "ID": 6,
+                    "Name": "Candidat6"
+                },
+                {
+                    "ID": 7,
+                    "Name": "Candidat7"
+                },
+                {
+                    "ID": 8,
+                    "Name": "Candidat8"
+                },
+                {
+                    "ID": 9,
+                    "Name": "Candidat9"
+                },
+                {
+                    "ID": 10,
+                    "Name": "Candidat10"
+                }
+            ]
+        }
+    ]
+}

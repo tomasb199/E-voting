@@ -4,7 +4,7 @@ import "./inputID.css";
 
 const InputID = props => {
   return (
-    <div class="form-inline inputID">
+    <div className="form-inline inputID">
       <b>Your ID</b>
       <input
         type="number"

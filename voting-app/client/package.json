@@ -16,6 +16,7 @@
     "react-confirm": "^0.1.18",
     "react-csv": "^1.1.1",
     "react-dom": "^16.8.6",
+    "react-dropdown": "^1.6.4",
     "react-google-login": "^5.0.5",
     "react-notifications": "^1.4.3",
     "react-router-dom": "^5.0.1",

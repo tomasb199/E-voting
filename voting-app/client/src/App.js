@@ -16,7 +16,7 @@ function App() {
     <div id="container">
       <BrowserRouter>
         <Route path="/" component={Header} />
-        <body id="body">
+        <div id="body">
           <Switch>
             <Route path="/login" component={Login} exact />
             <Route path="/" component={Menu} exact />
@@ -25,7 +25,7 @@ function App() {
             <Route path="/result" component={ChartsPage} exact />
             <Route path="*" component={Error} />
           </Switch>
-        </body>
+        </div>
         <Footer />
       </BrowserRouter>
     </div>

@@ -34,3 +34,8 @@
   grid-column-gap: 5px;
   width: 170px;
 }
+
+.dropdown {
+  margin-top: 10px;
+  width: 250px;
+}

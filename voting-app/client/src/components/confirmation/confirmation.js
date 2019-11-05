@@ -81,7 +81,8 @@ export function confirm(
   proceedLabel = "OK",
   cancelLabel = "Back",
   title = "Confimation your vote",
-  options = {}
+  options = {},
+  proceed
 ) {
   return createConfirmation(confirmable(Confirmation))({
     confirmation,
