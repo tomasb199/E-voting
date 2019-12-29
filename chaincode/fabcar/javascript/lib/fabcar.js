@@ -11,54 +11,23 @@ const { Contract } = require("fabric-contract-api");
 const { verifyProof } = require("paillier-in-set-zkp");
 const paillier = require("paillier-js");
 var bigInt = require("big-integer");
+const path = require("path");
+const fs = require("fs");
 
-let PublicKey, PrivateKey;
+let PublicKey = undefined;
 let validCandidates;
-var bit = 1024;
+var bit = undefined;
 let sizeElectionDistrict = 1000;
+
+// connect to the pres election file
+const ballotDataPath = path.join(process.cwd(), "./data/configData.json");
+const ballotDataJson = fs.readFileSync(ballotDataPath, "utf8");
+const ballotData = JSON.parse(ballotDataJson);
+
 class FabCar extends Contract {
     async initLedger(ctx) {
-        var { publicKey, privateKey } = await paillier.generateRandomKeys(bit); // Change to at least 2048 bits in production state
-        //await ctx.stub.putState('PublicKey', Buffer.from(JSON.stringify(publicKey)));
-        PublicKey = publicKey;
-        PrivateKey = privateKey;
-
-        console.info("\n\nTesting additive homomorphism\n");
-
         console.info("============= START : Initialize Ledger ===========");
-        const candidates = [
-            {
-                ID: "1",
-                Name: "Robert Fico",
-                Description: "SMER-SD",
-                Foto:
-                    "https://upload.wikimedia.org/wikipedia/commons/7/7c/Fico_Juncker_%28cropped%29.jpg",
-                Age: "45"
-            },
-            {
-                ID: "2",
-                Name: "Marian Kotleba",
-                Description: "LSNS",
-                Foto:
-                    "https://cdn.webnoviny.sk/sites/32/2017/10/marian-kotleba-676x451.jpg",
-                Age: "88"
-            },
-            {
-                ID: "3",
-                Name: "Bela Bugar",
-                Description: "MOST-HID",
-                Foto:
-                    "https://www.most-hid.sk/sites/most-hid.sk/files/story/bugar-bela.jpg",
-                Age: "42"
-            },
-            {
-                ID: "4",
-                Name: "Tomas Bujna",
-                Description: "FIIT",
-                Foto: "https://i.imgur.com/UQihxU0.jpg",
-                Age: "24"
-            }
-        ];
+        const candidates = ballotData;
 
         // Generate voting keys
         validCandidates = candidates.map((c, i) => {
@@ -76,7 +45,6 @@ class FabCar extends Contract {
             console.info("Added <--> ", candidates[i]);
         }
 
-        await ctx.stub.putState("bits", Buffer.from(bit.toString()));
         await ctx.stub.putState(
             "validCandidates",
             Buffer.from(JSON.stringify(validCandidates))
@@ -92,18 +60,22 @@ class FabCar extends Contract {
         return JSON.stringify(PublicKey);
     }
 
-    /*    async getCan(ctx) {
-        const exists = await this.dataExists(ctx, "validCandidates");
-        if (!exists) {
-            throw new Error("The bits does not exist");
-        }
-
-        const buffer = await ctx.stub.getState("validCandidates");
-        const asset = JSON.parse(buffer.toString());
-
-        return asset;
+    async sendVotingKey(ctx, publicKey) {
+        const key = JSON.parse(publicKey);
+        await ctx.stub.putState(
+            "HEPublicKey",
+            Buffer.from(JSON.stringify(key))
+        );
+        PublicKey = new paillier.PublicKey(bigInt(key.n), bigInt(key.g));
+        return true;
     }
-*/
+
+    async sendVotingKeyBits(ctx, bits) {
+        bit = JSON.parse(bits);
+        await ctx.stub.putState("bits", Buffer.from(JSON.stringify(bit)));
+        return true;
+    }
+
     async getBits(ctx) {
         const exists = await this.dataExists(ctx, "bits");
         if (!exists) {
@@ -223,14 +195,14 @@ class FabCar extends Contract {
 
     async countVote(ctx) {
         let vote = 0;
-        var temp;
+        //var temp;
 
         const allVotes = JSON.parse(await this.queryAllVote(ctx));
 
         // Cipfer sum of all votes
         allVotes.forEach((element, i) => {
             if (i !== 0) {
-                temp = element.Record.Vote;
+                let temp = element.Record.Vote;
                 console.info(temp);
                 vote = PublicKey.addition(vote, temp.toString());
             } else {
@@ -238,22 +210,11 @@ class FabCar extends Contract {
             }
         });
 
-        // Decrypt sum of all votes
-        const sum = PrivateKey.decrypt(vote);
+        const res = {
+            res: vote
+        };
 
-        // Parse sum of all votes to for each candidate
-        const allCandidates = JSON.parse(await this.queryAllCandidates(ctx));
-        let res = allCandidates.map(function(obj, i, array) {
-            if (i + 1 < array.length) {
-                return sum
-                    .mod(array[i + 1].Record.Vote) //TODO: potreba zmenit na nasledujucu hodnotu
-                    .divide(obj.Record.Vote)
-                    .toString();
-            } else {
-                return sum.divide(obj.Record.Vote).toString();
-            }
-        });
-        return res;
+        return JSON.stringify(res);
     }
 }
 

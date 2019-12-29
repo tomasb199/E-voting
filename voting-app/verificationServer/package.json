@@ -1,0 +1,26 @@
+{
+  "name": "verification_server",
+  "version": "1.0.0",
+  "description": "Verification server for E-voting app.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js"
+  },
+  "keywords": [
+    "Paillier",
+    "Digital Signature"
+  ],
+  "author": "Tomas Bujna",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "fabric-ca-client": "^1.4.4",
+    "fabric-network": "^1.4.4",
+    "nodemon": "^1.19.4",
+    "paillier-bignum": "^1.2.1",
+    "paillier-js": "^0.9.2"
+  }
+}

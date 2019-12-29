@@ -28,7 +28,7 @@ class VerifyVote extends Component {
 
   componentDidMount() {
     axios
-      .get("/voting-app/candidates/")
+      .get("http://localhost:8000/voting-app/candidates/")
       .then(response => response.data)
       .then(candidates => {
         this.setState({ candidates });
@@ -40,7 +40,7 @@ class VerifyVote extends Component {
       });
 
     axios
-      .get("/voting-app/getPubKey/")
+      .get("http://localhost:8000/voting-app/getPubKey/")
       .then(response => response.data)
       .then(pubKey => {
         this.setState({ pubKey });
@@ -55,7 +55,7 @@ class VerifyVote extends Component {
       console.log(data[0][0]);
       console.log(data[1][0]);
       axios
-        .get("/voting-app/getVote", {
+        .get("http://localhost:8000/voting-app/getVote", {
           params: {
             ID: this.state.id
           }
@@ -120,15 +120,16 @@ class VerifyVote extends Component {
       {
         Header: "Vote",
         style: {
-          textAlign: "center"
+          textAlign: "center",
+          padding: "40px 0"
         },
         Cell: props => {
           return (
-            <div className="radio">
+            <div className='radio'>
               <label>
                 <input
-                  type="radio"
-                  name="optradio"
+                  type='radio'
+                  name='optradio'
                   onClick={() => {
                     this.state.currentVote = props.original.Record;
                   }}
@@ -147,26 +148,51 @@ class VerifyVote extends Component {
         Header: "ID",
         accessor: "Record.ID",
         style: {
+          textAlign: "center",
+          padding: "40px 0"
+        },
+        maxWidth: 75,
+        headerStyle: divStyle
+      },
+      {
+        Header: "Photo",
+        style: {
           textAlign: "center"
         },
-        width: 75,
-        maxWidth: 75,
-        minWidth: 75,
+        Cell: props => {
+          return (
+            <div>
+              <img
+                src={props.original.Record.Foto}
+                width='100'
+                height='100'
+                className='photos'
+                alt=''
+              />
+            </div>
+          );
+        },
+        sortable: false,
+        maxWidth: 200,
+        minWidth: 110,
         headerStyle: divStyle
       },
       {
         Header: "Name",
         accessor: "Record.Name",
         style: {
-          textAlign: "center"
+          textAlign: "center",
+          padding: "40px 0"
         },
         headerStyle: divStyle
       },
+
       {
         Header: "Party",
         accessor: "Record.Description",
         style: {
-          textAlign: "center"
+          textAlign: "center",
+          padding: "40px 0"
         },
         filterable: false,
         headerStyle: divStyle
@@ -175,36 +201,37 @@ class VerifyVote extends Component {
         Header: "Age",
         accessor: "Record.Age",
         style: {
-          textAlign: "center"
+          textAlign: "center",
+          padding: "45px 0"
         },
+        maxWidth: 200,
         filterable: false,
         headerStyle: divStyle
       }
     ];
 
     return (
-      <div>
-        <br />
+      <div className='myform'>
         <Card
-          title="Verify your vote."
-          text="Enter your voting file and choose your candidate."
+          title='Verify your vote.'
+          text='Enter your voting file and choose your candidate.'
         />
         <br />
         <FileReader onFileLoaded={this.handleForce} />
         <br />
         <ReactTable
-          className="-striped -highlight"
+          className='-striped -highlight'
           defaultPageSize={5}
           minRows={1}
           columns={columns}
           data={this.state.candidates}
         />
         <br />
-        <div className="button-group">
-          <Button variant="success" className="success" onClick={this.verify}>
+        <div className='button-group'>
+          <Button variant='success' className='success' onClick={this.verify}>
             Verify
           </Button>
-          <Button variant="danger" onClick={() => this.props.history.push("/")}>
+          <Button variant='danger' onClick={() => this.props.history.push("/")}>
             Back
           </Button>
         </div>

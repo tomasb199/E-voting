@@ -1,0 +1,30 @@
+[
+    {
+        "ID": "1",
+        "Name": "Robert Fico",
+        "Description": "SMER-SD",
+        "Foto": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Fico_Juncker_%28cropped%29.jpg",
+        "Age": "55"
+    },
+    {
+        "ID": "2",
+        "Name": "Marian Kotleba",
+        "Description": "LSNS",
+        "Foto": "https://cdn.webnoviny.sk/sites/32/2017/10/marian-kotleba-676x451.jpg",
+        "Age": "88"
+    },
+    {
+        "ID": "3",
+        "Name": "Bela Bugar",
+        "Description": "MOST-HID",
+        "Foto": "http://volby.transparency.sk/prezident2019/wp-content/uploads/sites/7/2019/02/foto_bugar_300_400.png",
+        "Age": "60"
+    },
+    {
+        "ID": "4",
+        "Name": "Tomas Bujna",
+        "Description": "FIIT",
+        "Foto": "https://i.imgur.com/UQihxU0.jpg",
+        "Age": "24"
+    }
+]

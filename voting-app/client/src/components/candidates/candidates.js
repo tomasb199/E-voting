@@ -48,7 +48,7 @@ class Candidates extends Component {
 
   componentDidMount() {
     axios
-      .get("/voting-app/candidates/")
+      .get("http://localhost:8000/voting-app/candidates/")
       .then(response => response.data)
       .then(candidates => {
         this.setState({ candidates });
@@ -61,7 +61,7 @@ class Candidates extends Component {
       });
 
     axios
-      .get("/voting-app/getPubKey/")
+      .get("http://localhost:8000/voting-app/getPubKey/")
       .then(response => response.data)
       .then(pubKey => {
         this.setState({ pubKey });
@@ -74,7 +74,7 @@ class Candidates extends Component {
       });
 
     axios
-      .get("/voting-app/getBits/")
+      .get("http://localhost:8000/voting-app/getBits/")
       .then(response => response.data)
       .then(bits => {
         this.setState({ bits });
@@ -101,6 +101,7 @@ class Candidates extends Component {
       this.state.loading = true;
       console.log(this.state.publicKey.toString());
       console.time("encrypt");
+      console.log("Vote key: ", this.state.vote);
       var temp = false;
       do {
         temp = false;
@@ -131,12 +132,12 @@ class Candidates extends Component {
       console.log(vote);
       console.time("verify");
       axios
-        .post("/voting-app/vote", vote)
+        .post("http://localhost:8000/voting-app/vote", vote)
         .then(response => {
           console.log(response);
           if (response.data === true) {
-            /*this.setState({ isFinish: true });
-            this.state.isFinish = true;*/
+            this.setState({ isFinish: true });
+            this.state.isFinish = true;
             this.setState({ loading: false });
             NotificationManager.success("Your vote is counted :-)", "SUCCESS!");
             console.timeEnd("verify");
@@ -161,11 +162,24 @@ class Candidates extends Component {
   };
 
   handleDownload = () => {
-    console.log("TU!");
     confirm("Are you want verify your vote?", "OK", "Back", "Vote verify").then(
       this.setState({ isDowloaded: true })
     );
   };
+
+  /*downloadTxtFile = async () => {
+      const element = document.createElement("a");
+      const file = new Blob([JSON.stringify(vote)], {
+        type: "text/plain"
+      });
+      element.href = URL.createObjectURL(file);
+      element.download = "myFile.txt";
+      document.body.appendChild(element); // Required for this to work in FireFox
+      element.click();
+      this.setState({ loading: false });
+    });
+  };
+  */
 
   render() {
     const divStyle = {
@@ -181,10 +195,10 @@ class Candidates extends Component {
         },
         Cell: props => {
           return (
-            <div className="radio align-middle">
+            <div className='radio align-middle'>
               <input
-                type="radio"
-                name="optradio"
+                type='radio'
+                name='optradio'
                 onClick={() => {
                   this.state.vote = props.original.Record.Vote;
                   this.state.voteName = props.original.Record.Name;
@@ -218,10 +232,10 @@ class Candidates extends Component {
             <div>
               <img
                 src={props.original.Record.Foto}
-                width="100"
-                height="100"
-                className="photos"
-                alt=""
+                width='100'
+                height='100'
+                className='photos'
+                alt=''
               />
             </div>
           );
@@ -265,15 +279,15 @@ class Candidates extends Component {
     ];
 
     return (
-      <div className="myform">
+      <div className='myform'>
         <Card
-          title="Welcome in voting app."
-          text="Choose one candidate and submit your vote."
+          title='Welcome in voting app.'
+          text='Choose one candidate and submit your vote.'
         />
-        <div className="sweet-loading">
+        <div className='sweet-loading'>
           <InputID output={this.output} />
           <ReactTable
-            className="-striped -highlight"
+            className='-striped -highlight'
             defaultPageSize={5}
             minRows={1}
             columns={columns}
@@ -281,12 +295,12 @@ class Candidates extends Component {
           ></ReactTable>
           <br />
           {!this.state.isFinish && (
-            <div className="button-group">
-              <Button variant="success" onClick={this.handleOnClickVote}>
+            <div className='button-group'>
+              <Button variant='success' onClick={this.handleOnClickVote}>
                 Vote
               </Button>
               <Button
-                variant="danger"
+                variant='danger'
                 onClick={() => this.props.history.push("/")}
               >
                 Back
@@ -297,8 +311,8 @@ class Candidates extends Component {
             <CSVLink
               data={this.state.id + "\n" + this.state.random}
               filename={"my-file.csv"}
-              className="btn btn-info"
-              target="_blank"
+              className='btn btn-info'
+              target='_blank'
               onClick={this.handleDownload}
             >
               Download me
