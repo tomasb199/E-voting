@@ -15,7 +15,7 @@ const path = require("path");
 const fs = require("fs");
 
 // connect to the pres election file
-const ballotDataPath = path.join(process.cwd(), "./lib/data/configData2.json");
+const ballotDataPath = path.join(process.cwd(), "./lib/data/configData.json");
 const ballotDataJson = fs.readFileSync(ballotDataPath, "utf8");
 const ballotData = JSON.parse(ballotDataJson);
 
@@ -85,6 +85,27 @@ class FabCar extends Contract {
             if (pubKey.verify(JSON.stringify(vote.candidate), vote.Sign)) {
                 const buffer = Buffer.from(JSON.stringify(vote));
                 await ctx.stub.putState("VOTE" + vote.id, buffer);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (err) {
+            return shim.error(err);
+        }
+    }
+
+    async createVoteWithSign(ctx, voteJSON, id) {
+        if (isNaN(id)) {
+            return "ID is not a number!";
+        }
+
+        try {
+            var pubKey = new r.KEYUTIL.getKey(await this.getSigningKey(ctx));
+            const vote = JSON.parse(voteJSON);
+
+            if (pubKey.verify(JSON.stringify(vote.candidate), vote.Sign)) {
+                const buffer = Buffer.from(JSON.stringify(vote));
+                await ctx.stub.putState("VOTE" + id, buffer);
                 return true;
             } else {
                 return false;

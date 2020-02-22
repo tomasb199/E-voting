@@ -105,7 +105,7 @@ app.post("/verifyVote", (req, res) => {
   console.log(req.body);
   const fullVote = req.body; // Full vote structure for sign
   const vote = req.body.candidate; // Only votes for verify
-  console.time("verifyVote");
+  console.time("Verify vote");
   if (fullVote.voteType === 1) {
     try {
       let sum = 0;
@@ -227,7 +227,7 @@ app.post("/verifyVote", (req, res) => {
       console.log(err);
       res.send(false);
     }
-    console.timeEnd("verifyVote");
+    console.timeEnd("Verify vote");
   }
 });
 

@@ -1,28 +1,38 @@
 //Import Hyperledger Fabric 1.4 programming model - fabric-network
-'use strict';
+"use strict";
 
-const { FileSystemWallet, Gateway, X509WalletMixin } = require('fabric-network');
-const path = require('path');
-const fs = require('fs');
+const {
+  FileSystemWallet,
+  Gateway,
+  X509WalletMixin
+} = require("fabric-network");
+const path = require("path");
+const fs = require("fs");
 
 //connect to the config file
-const configPath = path.resolve(__dirname, '..', '..', '..', 'basic-network', 'connection.json');
-const configJSON = fs.readFileSync(configPath, 'utf8');
+const configPath = path.resolve(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "basic-network",
+  "connection.json"
+);
+const configJSON = fs.readFileSync(configPath, "utf8");
 const config = JSON.parse(configJSON);
 // let userName = config.userName;
-let gatewayDiscovery = { "enabled": false }; //static
+let gatewayDiscovery = { enabled: false }; //static
 /*let appAdmin = config.appAdmin;
 let orgMSPID = config.orgMSPID;
 */
 
-const util = require('util');
+const util = require("util");
 
-exports.connectToNetwork = async function (userName) {
-  
+exports.connectToNetwork = async function(userName) {
   const gateway = new Gateway();
 
   try {
-    const walletPath = path.join(process.cwd(), 'wallet');
+    const walletPath = path.join(process.cwd(), "wallet");
     const wallet = new FileSystemWallet(walletPath);
     /*console.log(`Wallet path: ${walletPath}`);
     console.log('userName: ');
@@ -35,23 +45,34 @@ exports.connectToNetwork = async function (userName) {
     // userName = 'V123412';
     const userExists = await wallet.exists(userName);
     if (!userExists) {
-      console.log('An identity for the user ' + userName + ' does not exist in the wallet');
-      console.log('Run the registerUser.js application before retrying');
+      console.log(
+        "An identity for the user " + userName + " does not exist in the wallet"
+      );
+      console.log("Run the registerUser.js application before retrying");
       let response = {};
-      response.error = 'An identity for the user ' + userName + ' does not exist in the wallet. Register ' + userName + ' first';
+      response.error =
+        "An identity for the user " +
+        userName +
+        " does not exist in the wallet. Register " +
+        userName +
+        " first";
       return response;
     }
 
     //console.log('before gateway.connect: ');
 
-    await gateway.connect(config, { wallet, identity: userName, discovery: gatewayDiscovery });
+    await gateway.connect(config, {
+      wallet,
+      identity: userName,
+      discovery: gatewayDiscovery
+    });
 
     // Connect to our local fabric
-    const network = await gateway.getNetwork('mychannel');
+    const network = await gateway.getNetwork("mychannel");
     //console.log('Connected to mychannel. ');
-    
+
     // Get the contract we have installed on the peer
-    const contract = await network.getContract('fabcar');
+    const contract = await network.getContract("fabcar");
 
     let networkObj = {
       contract: contract,
@@ -60,7 +81,6 @@ exports.connectToNetwork = async function (userName) {
     };
 
     return networkObj;
-
   } catch (error) {
     console.log(`Error processing transaction. ${error}`);
     console.log(error.stack);
@@ -73,31 +93,32 @@ exports.connectToNetwork = async function (userName) {
   }
 };
 /**
-   *
-   * invoke
-   *
-   * This function invoke the ledger.
-   * 
-   * @param networkObj - network object for invoke
-   * @param isQuery - (true/false)
-   * @param func - name of function
-   * @param args - optional
-*/
-exports.invoke = async function (networkObj, isQuery, func, args) {
+ *
+ * invoke
+ *
+ * This function invoke the ledger.
+ *
+ * @param networkObj - network object for invoke
+ * @param isQuery - (true/false)
+ * @param func - name of function
+ * @param args - optional
+ */
+exports.invoke = async function(networkObj, isQuery, func, args) {
   try {
-
     if (isQuery === true) {
       if (args) {
         console.log(args);
-        let response = await networkObj.contract.evaluateTransaction(func, args);
-        console.log(response.toString())
+        let response = await networkObj.contract.evaluateTransaction(
+          func,
+          args
+        );
+        console.log(response.toString());
         await networkObj.gateway.disconnect();
-      
+
         return response;
-      } 
-      else {
+      } else {
         let response = await networkObj.contract.evaluateTransaction(func);
-        console.log(response.toString())
+        console.log(response.toString());
         await networkObj.gateway.disconnect();
 
         return response;
@@ -106,20 +127,19 @@ exports.invoke = async function (networkObj, isQuery, func, args) {
       if (args) {
         console.log(args[0]);
         args = JSON.stringify(args[0]);
+        console.log("Toto: ", args);
         let response = await networkObj.contract.submitTransaction(func, args);
-        console.log(response.toString())
+        console.log(response.toString());
         await networkObj.gateway.disconnect();
 
         return response;
-      } 
-      else {
+      } else {
         let response = await networkObj.contract.submitTransaction(func);
         await networkObj.gateway.disconnect();
-  
+
         return response;
       }
     }
-
   } catch (error) {
     console.error(`Failed to submit transaction: ${error}`);
     return error;

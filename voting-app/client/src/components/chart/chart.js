@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Bar, HorizontalBar, Pie } from "react-chartjs-2";
-import { MDBContainer } from "mdbreact";
 import Spinner from "../loading-spinner/loading-spinner";
 import axios from "axios";
 
@@ -30,10 +29,12 @@ class ChartsPage extends Component {
       .then(voteData => {
         this.setState({ voteType: voteData.voteType });
         this.setState({ voteData });
+        console.time("decrypt");
         axios
           .get("http://localhost:5000/getResult")
           .then(response => response.data)
           .then(result => {
+            console.timeEnd("decrypt");
             if (result === false) {
               this.setState({ loading: false });
               console.log("Result:", result);
@@ -128,16 +129,6 @@ class ChartsPage extends Component {
         }
       ]
     };
-    //Koncept pre pocitanie percent
-    /*const sum = this.state.resultNumbers.reduce(
-      (a, b) => Number(a) + Number(b)
-    );
-    console.log(sum);
-    const percentage = this.state.resultNumbers.map(item => {
-      return ((100 * Number(item)) / sum).toFixed(2);
-    });
-    console.log(percentage);
-    */
     this.setState({ currentPreferentialVotesObj: data });
     this.setState({ selectParty: input });
   };
@@ -203,6 +194,9 @@ class ChartsPage extends Component {
               gridLines: {
                 display: false,
                 color: "rgba(0, 0, 0, 0.1)"
+              },
+              ticks: {
+                precision: 0
               }
             }
           ],
@@ -213,7 +207,7 @@ class ChartsPage extends Component {
                 color: "rgba(0, 0, 0, 0.1)"
               },
               ticks: {
-                beginAtZero: true
+                precision: 0
               }
             }
           ]
@@ -221,12 +215,12 @@ class ChartsPage extends Component {
       };
 
     return (
-      <div className="">
+      <div className=''>
         {!this.state.loading && (
-          <div className="">
-            <div className="row">
-              <div className="col-sm card">
-                <h3 className="mt-5 font-weight-bold">Voting result</h3>
+          <div className=''>
+            <div className='row'>
+              <div className='col-sm card'>
+                <h3 className='mt-5 font-weight-bold'>Voting result</h3>
                 <Bar
                   data={dataBar}
                   options={barChartOptions}
@@ -237,13 +231,13 @@ class ChartsPage extends Component {
                   }}
                 />
               </div>
-              <div className="col-sm card">
+              <div className='col-sm card'>
                 {this.state.voteType === 2 &&
                   Object.getOwnPropertyNames(
                     this.state.currentPreferentialVotesObj
                   ).length >= 1 && (
                     <div>
-                      <h4 className="mt-5 font-weight-bold">
+                      <h4 className='mt-5 font-weight-bold'>
                         Preferential votes for {this.state.selectParty}
                       </h4>
                       <HorizontalBar
@@ -254,7 +248,7 @@ class ChartsPage extends Component {
                   )}
                 {this.state.voteType === 1 && (
                   <div>
-                    <h4 className="mt-5 font-weight-bold">
+                    <h4 className='mt-5 font-weight-bold'>
                       Result in percentage
                     </h4>
                     <Pie data={dataPie} />

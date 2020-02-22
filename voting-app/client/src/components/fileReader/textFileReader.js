@@ -1,0 +1,46 @@
+import React from "react";
+import { func } from "prop-types";
+
+const FileRead = ({
+  accept = ".csv, text/csv, .json, text/plain",
+  onFileLoaded,
+  onError,
+  parserOptions = {}
+}) => {
+  const handleChangeFile = e => {
+    let reader = new FileReader();
+    console.log(e.target.files);
+    if (e.target.files.length > 0) {
+      const filename = e.target.files[0].name;
+
+      reader.onload = event => {
+        const csvData = event.target.result;
+        onFileLoaded(csvData, filename);
+      };
+
+      reader.readAsText(e.target.files[0]);
+    }
+  };
+  return (
+    <form>
+      <div className='custom-file'>
+        <input
+          type='file'
+          className='custom-file-input'
+          id='customFile'
+          onChange={e => handleChangeFile(e)}
+          accept={accept}
+        />
+        <label className='custom-file-label' htmlFor='customFile'>
+          Choose file
+        </label>
+      </div>
+    </form>
+  );
+};
+FileRead.propTypes = {
+  onFileLoaded: func.isRequired,
+  onError: func
+};
+
+export default FileRead;

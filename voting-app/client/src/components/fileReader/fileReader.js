@@ -1,14 +1,13 @@
-import React from 'react';
-import {func} from 'prop-types';
-const PapaParse = require('papaparse/papaparse.min.js');
+import React from "react";
+import { func } from "prop-types";
+const PapaParse = require("papaparse/papaparse.min.js");
 
 const FileRead = ({
-    accept = '.csv, text/csv',
-    onFileLoaded,
-    onError,
-    parserOptions = {}
+  accept = ".csv, text/csv, .json, text/plain",
+  onFileLoaded,
+  onError,
+  parserOptions = {}
 }) => {
-
   const handleChangeFile = e => {
     let reader = new FileReader();
     console.log(e.target.files);
@@ -28,18 +27,26 @@ const FileRead = ({
       reader.readAsText(e.target.files[0]);
     }
   };
-        return(
-            <form>
-                <div className="custom-file">
-                    <input type="file" className="custom-file-input" id="customFile" onChange={e => handleChangeFile(e)} accept={accept}/>
-                    <label className="custom-file-label" htmlFor="customFile">Choose file</label>
-                </div>
-            </form>
-        );
-    };
-    FileRead.propTypes = {
-        onFileLoaded: func.isRequired,
-        onError: func,
-    };
+  return (
+    <form>
+      <div className='custom-file'>
+        <input
+          type='file'
+          className='custom-file-input'
+          id='customFile'
+          onChange={e => handleChangeFile(e)}
+          accept={accept}
+        />
+        <label className='custom-file-label' htmlFor='customFile'>
+          Choose file
+        </label>
+      </div>
+    </form>
+  );
+};
+FileRead.propTypes = {
+  onFileLoaded: func.isRequired,
+  onError: func
+};
 
 export default FileRead;

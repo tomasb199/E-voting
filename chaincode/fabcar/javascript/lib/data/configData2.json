@@ -4,185 +4,185 @@
     "candidate": [
         {
             "ID": "1",
-            "Party": "SMER-SD",
+            "Party": "Party 1",
             "Candidates": [
                 {
                     "ID": 1,
-                    "Name": "Candidat1"
+                    "Name": "Party 1 - Candidat1"
                 },
                 {
                     "ID": 2,
-                    "Name": "Candidat2"
+                    "Name": "Party 1 - Candidat2"
                 },
                 {
                     "ID": 3,
-                    "Name": "Candidat3"
+                    "Name": "Party 1 - Candidat3"
                 },
                 {
                     "ID": 4,
-                    "Name": "Candidat4"
+                    "Name": "Party 1 - Candidat4"
                 },
                 {
                     "ID": 5,
-                    "Name": "Candidat5"
+                    "Name": "Party 1 - Candidat5"
                 },
                 {
                     "ID": 6,
-                    "Name": "Candidat6"
+                    "Name": "Party 1 - Candidat6"
                 },
                 {
                     "ID": 7,
-                    "Name": "Candidat7"
+                    "Name": "Party 1 - Candidat7"
                 },
                 {
                     "ID": 8,
-                    "Name": "Candidat8"
+                    "Name": "Party 1 - Candidat8"
                 },
                 {
                     "ID": 9,
-                    "Name": "Candidat9"
+                    "Name": "Party 1 - Candidat9"
                 },
                 {
                     "ID": 10,
-                    "Name": "Candidat10"
+                    "Name": "Party 1 - Candidat10"
                 }
             ]
         },
         {
             "ID": "2",
-            "Party": "LSNS",
+            "Party": "Party 2",
             "Candidates": [
                 {
                     "ID": 1,
-                    "Name": "Candidat1"
+                    "Name": "Party 2 - Candidat1"
                 },
                 {
                     "ID": 2,
-                    "Name": "Candidat2"
+                    "Name": "Party 2 - Candidat2"
                 },
                 {
                     "ID": 3,
-                    "Name": "Candidat3"
+                    "Name": "Party 2 - Candidat3"
                 },
                 {
                     "ID": 4,
-                    "Name": "Candidat4"
+                    "Name": "Party 2 - Candidat4"
                 },
                 {
                     "ID": 5,
-                    "Name": "Candidat5"
+                    "Name": "Party 2 - Candidat5"
                 },
                 {
                     "ID": 6,
-                    "Name": "Candidat6"
+                    "Name": "Party 2 - Candidat6"
                 },
                 {
                     "ID": 7,
-                    "Name": "Candidat7"
+                    "Name": "Party 2 - Candidat7"
                 },
                 {
                     "ID": 8,
-                    "Name": "Candidat8"
+                    "Name": "Party 2 - Candidat8"
                 },
                 {
                     "ID": 9,
-                    "Name": "Candidat9"
+                    "Name": "Party 2 - Candidat9"
                 },
                 {
                     "ID": 10,
-                    "Name": "Candidat10"
+                    "Name": "Party 2 - Candidat10"
                 }
             ]
         },
         {
             "ID": "3",
-            "Party": "MOST-HID",
+            "Party": "Party 3",
             "Candidates": [
                 {
                     "ID": 1,
-                    "Name": "Candidat1"
+                    "Name": "Party 3 - Candidat1"
                 },
                 {
                     "ID": 2,
-                    "Name": "Candidat2"
+                    "Name": "Party 3 - Candidat2"
                 },
                 {
                     "ID": 3,
-                    "Name": "Candidat3"
+                    "Name": "Party 3 - Candidat3"
                 },
                 {
                     "ID": 4,
-                    "Name": "Candidat4"
+                    "Name": "Party 3 - Candidat4"
                 },
                 {
                     "ID": 5,
-                    "Name": "Candidat5"
+                    "Name": "Party 3 - Candidat5"
                 },
                 {
                     "ID": 6,
-                    "Name": "Candidat6"
+                    "Name": "Party 3 - Candidat6"
                 },
                 {
                     "ID": 7,
-                    "Name": "Candidat7"
+                    "Name": "Party 3 - Candidat7"
                 },
                 {
                     "ID": 8,
-                    "Name": "Candidat8"
+                    "Name": "Party 3 - Candidat8"
                 },
                 {
                     "ID": 9,
-                    "Name": "Candidat9"
+                    "Name": "Party 3 - Candidat9"
                 },
                 {
                     "ID": 10,
-                    "Name": "Candidat10"
+                    "Name": "Party 3 - Candidat10"
                 }
             ]
         },
         {
             "ID": "4",
-            "Party": "FIIT",
+            "Party": "Party 4",
             "Candidates": [
                 {
                     "ID": 1,
-                    "Name": "Candidat1"
+                    "Name": "Party 4 - Candidat1"
                 },
                 {
                     "ID": 2,
-                    "Name": "Candidat2"
+                    "Name": "Party 4 - Candidat2"
                 },
                 {
                     "ID": 3,
-                    "Name": "Candidat3"
+                    "Name": "Party 4 - Candidat3"
                 },
                 {
                     "ID": 4,
-                    "Name": "Candidat4"
+                    "Name": "Party 4 - Candidat4"
                 },
                 {
                     "ID": 5,
-                    "Name": "Candidat5"
+                    "Name": "Party 4 - Candidat5"
                 },
                 {
                     "ID": 6,
-                    "Name": "Candidat6"
+                    "Name": "Party 4 - Candidat6"
                 },
                 {
                     "ID": 7,
-                    "Name": "Candidat7"
+                    "Name": "Party 4 - Candidat7"
                 },
                 {
                     "ID": 8,
-                    "Name": "Candidat8"
+                    "Name": "Party 4 - Candidat8"
                 },
                 {
                     "ID": 9,
-                    "Name": "Candidat9"
+                    "Name": "Party 4 - Candidat9"
                 },
                 {
                     "ID": 10,
-                    "Name": "Candidat10"
+                    "Name": "Party 4 - Candidat10"
                 }
             ]
         }
