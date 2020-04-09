@@ -1,6 +1,6 @@
 # E-voting
 
-## This is Blockchain-Based E-voting application.
+This is Blockchain-Based E-voting application.
 
 ---
 
