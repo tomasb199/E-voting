@@ -40,16 +40,9 @@ This is Blockchain-Based E-voting application.
   ./startVoting.sh
   ```
 
-**2. Register Hyperledger clients (server and verification server)**
+**2. Register Hyperledger Fabric clients (server and verification server)**
 
-- in path: "/voting-app/server" run script:
-  ```bash
-  node enrollAdmin.js
-  ```
-  ```bash
-  node registerUser.js
-  ```
-- in path: "/voting-app/verificationServer" run the same scripts:
+- in paths: "/voting-app/server", "/voting-app/verificationServer" run scripts:
   ```bash
   node enrollAdmin.js
   ```
