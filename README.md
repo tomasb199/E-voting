@@ -26,6 +26,13 @@ This is Blockchain-Based E-voting application.
 
 ### How to run application:
 
+**0. Install NodeJS libs**
+
+- in all paths: "/voting-app/server", "/voting-app/verificationServer", "/chaincode/fabcar/javascript" run:
+  ```bash
+  npm i
+  ```
+
 **1. Run Hyperledger Fabric**
 
 - in path: "/voting-app" run script:
@@ -60,7 +67,7 @@ This is Blockchain-Based E-voting application.
   ```bash
   npm run server
   ```
-- in path: "/voting-app/server" run script:
+- in path: "/voting-app/client" run script:
   ```bash
   npm run start
   ```
