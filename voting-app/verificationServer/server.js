@@ -18,7 +18,7 @@ var PrivateKey = undefined,
   signKey = undefined;
 var voteData = undefined;
 app.use(cors()); //Cors for use 2 API
-const appAdmin = "admin";
+const appVerificationServer = "verificationServer";
 
 //Function for init voting keys
 async function init() {
@@ -30,11 +30,11 @@ async function init() {
 
   const publicKeyObj = {
     n: publicKey.n.toString(),
-    g: publicKey.g.toString()
+    g: publicKey.g.toString(),
   };
 
   //Get from blockchain vote data
-  networkObj = await network.connectToNetwork(appAdmin);
+  networkObj = await network.connectToNetwork(appVerificationServer);
   let response = await network.invoke(
     networkObj,
     true,
@@ -44,7 +44,7 @@ async function init() {
   voteData = JSON.parse(JSON.parse(response));
 
   //Insert to blockchain HE Public Key
-  networkObj = await network.connectToNetwork(appAdmin);
+  networkObj = await network.connectToNetwork(appVerificationServer);
   response = await network.invoke(
     networkObj,
     false,
@@ -53,7 +53,7 @@ async function init() {
   );
 
   //Insert to blockchain RSA-signing Public Key
-  networkObj = await network.connectToNetwork(appAdmin);
+  networkObj = await network.connectToNetwork(appVerificationServer);
   response = await network.invoke(
     networkObj,
     false,
@@ -65,36 +65,39 @@ async function init() {
 init();
 
 app.get("/getResult", async (req, res) => {
-  let networkObj = await network.connectToNetwork(appAdmin);
+  let networkObj = await network.connectToNetwork(appVerificationServer);
   let response = await network.invoke(networkObj, true, "countVote", "");
   votingResult = JSON.parse(response);
   console.log("RESULT: ", votingResult);
 
   if (voteData.voteType === 1) {
-    decryptVotingResult = votingResult.map(candidate => {
+    console.time("decrypt");
+    decryptVotingResult = votingResult.map((candidate) => {
       candidate.res = PrivateKey.decrypt(candidate.res).toString();
       return candidate;
     });
+    console.timeEnd("decrypt");
     const finalResult = {
-      decryptVotingResult
+      decryptVotingResult,
     };
     res.send(finalResult);
   } else if (voteData.voteType === 2) {
-    decryptVotingResult = votingResult.Parties.map(candidate => {
+    decryptVotingResult = votingResult.Parties.map((candidate) => {
       candidate.res = PrivateKey.decrypt(candidate.res).toString();
       return candidate;
     });
-    const PreferentialVotes = votingResult.PreferentialVotes.map(party => {
-      party.res = party.res.map(element => {
+    const PreferentialVotes = votingResult.PreferentialVotes.map((party) => {
+      party.res = party.res.map((element) => {
         element = PrivateKey.decrypt(element).toString();
         return element;
       });
       return party;
     });
+
     console.log(PreferentialVotes);
     const finalResult = {
       decryptVotingResult,
-      PreferentialVotes
+      PreferentialVotes,
     };
 
     res.send(finalResult);
@@ -105,12 +108,12 @@ app.post("/verifyVote", (req, res) => {
   console.log(req.body);
   const fullVote = req.body; // Full vote structure for sign
   const vote = req.body.candidate; // Only votes for verify
-  console.time("Verify vote");
   if (fullVote.voteType === 1) {
     try {
       let sum = 0;
       let result = 0;
 
+      console.time("Verify");
       for (let i = 0; i < vote.length; i++) {
         //If there are no votes attribute
         if (!vote[i].hasOwnProperty("vote")) {
@@ -128,7 +131,7 @@ app.post("/verifyVote", (req, res) => {
         //I count all votes
         sum += Number(result);
       }
-
+      console.timeEnd("Verify");
       // If vote is correct sign
       if (sum === 1 || sum === 0) {
         var sig = new r.KJUR.crypto.Signature({ alg: "SHA1withRSA" });
@@ -227,7 +230,6 @@ app.post("/verifyVote", (req, res) => {
       console.log(err);
       res.send(false);
     }
-    console.timeEnd("Verify vote");
   }
 });
 

@@ -1,0 +1,12 @@
+{
+    "voteType": 1,
+    "candidate": [
+        {
+            "ID": "1",
+            "Name": "Robert Fico",
+            "Description": "SMER-SD",
+            "Foto": "https://pbs.twimg.com/profile_images/413300240154763265/UDByF6rG_400x400.jpeg",
+            "Age": "55"
+        }
+    ]
+}

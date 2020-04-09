@@ -7,6 +7,7 @@
 "use strict";
 
 const shim = require("fabric-shim");
+const ClientIdentity = require("fabric-shim").ClientIdentity;
 const { Contract } = require("fabric-contract-api");
 const paillier = require("paillier-js");
 let r = require("jsrsasign");
@@ -53,12 +54,19 @@ class FabCar extends Contract {
     }
 
     async sendVotingKey(ctx, publicKey) {
-        const key = JSON.parse(publicKey);
-        await ctx.stub.putState(
-            "HEPublicKey",
-            Buffer.from(JSON.stringify(key))
-        );
-        return true;
+        // access has only verification server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "verificationServer")) {
+            const key = JSON.parse(publicKey);
+            await ctx.stub.putState(
+                "HEPublicKey",
+                Buffer.from(JSON.stringify(key))
+            );
+            return true;
+        } else {
+            //Access denied
+            return false;
+        }
     }
 
     async getSigningKey(ctx) {
@@ -73,24 +81,42 @@ class FabCar extends Contract {
     }
 
     async sendSigningKey(ctx, publicKeyJSON) {
-        await ctx.stub.putState("SigningPublicKey", Buffer.from(publicKeyJSON));
-        return true;
+        // access has only verification server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "verificationServer")) {
+            await ctx.stub.putState(
+                "SigningPublicKey",
+                Buffer.from(publicKeyJSON)
+            );
+            return true;
+        } else {
+            //Access denied
+            return false;
+        }
     }
 
     async createVote(ctx, voteJSON) {
-        try {
-            var pubKey = new r.KEYUTIL.getKey(await this.getSigningKey(ctx));
-            const vote = JSON.parse(voteJSON);
+        // access has only verification server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "votingServer")) {
+            try {
+                var pubKey = new r.KEYUTIL.getKey(
+                    await this.getSigningKey(ctx)
+                );
+                const vote = JSON.parse(voteJSON);
 
-            if (pubKey.verify(JSON.stringify(vote.candidate), vote.Sign)) {
-                const buffer = Buffer.from(JSON.stringify(vote));
-                await ctx.stub.putState("VOTE" + vote.id, buffer);
-                return true;
-            } else {
-                return false;
+                if (pubKey.verify(JSON.stringify(vote.candidate), vote.Sign)) {
+                    const buffer = Buffer.from(JSON.stringify(vote));
+                    await ctx.stub.putState("VOTE" + vote.id, buffer);
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (err) {
+                return shim.error(err);
             }
-        } catch (err) {
-            return shim.error(err);
+        } else {
+            return cid.getAttributeValue("hf.EnrollmentID");
         }
     }
 
@@ -116,16 +142,23 @@ class FabCar extends Contract {
     }
 
     async readVote(ctx, voteId) {
-        const voteID_final = "VOTE" + voteId.toString();
-        const exists = await this.dataExists(ctx, voteID_final);
-        if (!exists) {
-            throw new Error(`The vote ${voteId} does not exist`);
+        // access has only verification server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "votingServer")) {
+            const voteID_final = "VOTE" + voteId.toString();
+            const exists = await this.dataExists(ctx, voteID_final);
+            if (!exists) {
+                throw new Error(`The vote ${voteId} does not exist`);
+            }
+            const buffer = await ctx.stub.getState(voteID_final);
+            const asset = JSON.parse(buffer.toString());
+            return asset;
+        } else {
+            return false;
         }
-        const buffer = await ctx.stub.getState(voteID_final);
-        const asset = JSON.parse(buffer.toString());
-        return asset;
     }
 
+    //For testing
     async queryAllVote(ctx) {
         const startKey = "VOTE0";
         const endKey = "VOTE9999";
@@ -158,90 +191,96 @@ class FabCar extends Contract {
     }
 
     async countVote(ctx) {
-        try {
-            const allVotes = JSON.parse(await this.queryAllVote(ctx));
-            const voteData = JSON.parse(await this.queryAllCandidates(ctx));
-            const publicKeyTemp = JSON.parse(await this.getVotingKey(ctx));
-            var PublicKey = new paillier.PublicKey(
-                bigInt(publicKeyTemp.n),
-                bigInt(publicKeyTemp.g)
-            );
-            let res = [];
-            //Pocet kandidatov
-            for (let y = 0; y < voteData.candidate.length; y++) {
-                let temp = 0;
-                //Idem cez vsetky hlasy
-                for (let x = 0; x < allVotes.length; x++) {
-                    if (x !== 0) {
-                        temp = PublicKey.addition(
-                            temp,
-                            allVotes[x].Record.candidate[y].vote.toString()
-                        );
-                    } else {
-                        temp = allVotes[x].Record.candidate[y].vote;
+        // access has only verification server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "verificationServer")) {
+            try {
+                const allVotes = JSON.parse(await this.queryAllVote(ctx));
+                const voteData = JSON.parse(await this.queryAllCandidates(ctx));
+                const publicKeyTemp = JSON.parse(await this.getVotingKey(ctx));
+                var PublicKey = new paillier.PublicKey(
+                    bigInt(publicKeyTemp.n),
+                    bigInt(publicKeyTemp.g)
+                );
+                let res = [];
+                //Pocet kandidatov
+                for (let y = 0; y < voteData.candidate.length; y++) {
+                    let temp = 0;
+                    //Idem cez vsetky hlasy
+                    for (let x = 0; x < allVotes.length; x++) {
+                        if (x !== 0) {
+                            temp = PublicKey.addition(
+                                temp,
+                                allVotes[x].Record.candidate[y].vote.toString()
+                            );
+                        } else {
+                            temp = allVotes[x].Record.candidate[y].vote;
+                        }
+                    }
+                    if (voteData.voteType === 1) {
+                        const result = {
+                            name: voteData.candidate[y].Name,
+                            res: temp,
+                        };
+
+                        res.push(result);
+                    } else if (voteData.voteType === 2) {
+                        const result = {
+                            name: voteData.candidate[y].Party,
+                            res: temp,
+                        };
+
+                        res.push(result);
                     }
                 }
                 if (voteData.voteType === 1) {
-                    const result = {
-                        name: voteData.candidate[y].Name,
-                        res: temp
-                    };
-
-                    res.push(result);
+                    return res;
                 } else if (voteData.voteType === 2) {
-                    const result = {
-                        name: voteData.candidate[y].Party,
-                        res: temp
-                    };
-
-                    res.push(result);
-                }
-            }
-            if (voteData.voteType === 1) {
-                return res;
-            } else if (voteData.voteType === 2) {
-                const PreferentialVotes = [];
-                for (let y = 0; y < voteData.candidate.length; y++) {
-                    let result = [];
-                    for (
-                        let z = 0;
-                        z < voteData.candidate[0].Candidates.length;
-                        z++
-                    ) {
-                        let temp = 0;
-                        //Idem cez vsetky hlasy
-                        for (let x = 0; x < allVotes.length; x++) {
-                            if (x !== 0) {
-                                temp = PublicKey.addition(
-                                    temp,
-                                    allVotes[x].Record.candidate[y].Candidates[
-                                        z
-                                    ].vote.toString()
-                                );
-                            } else {
-                                temp =
-                                    allVotes[x].Record.candidate[y].Candidates[
-                                        z
-                                    ].vote;
+                    const PreferentialVotes = [];
+                    for (let y = 0; y < voteData.candidate.length; y++) {
+                        let result = [];
+                        for (
+                            let z = 0;
+                            z < voteData.candidate[0].Candidates.length;
+                            z++
+                        ) {
+                            let temp = 0;
+                            //Idem cez vsetky hlasy
+                            for (let x = 0; x < allVotes.length; x++) {
+                                if (x !== 0) {
+                                    temp = PublicKey.addition(
+                                        temp,
+                                        allVotes[x].Record.candidate[
+                                            y
+                                        ].Candidates[z].vote.toString()
+                                    );
+                                } else {
+                                    temp =
+                                        allVotes[x].Record.candidate[y]
+                                            .Candidates[z].vote;
+                                }
                             }
+                            result.push(temp.toString());
                         }
-                        result.push(temp.toString());
+                        const resultObj = {
+                            name: voteData.candidate[y].Party,
+                            res: result,
+                        };
+                        PreferentialVotes.push(resultObj);
                     }
-                    const resultObj = {
-                        name: voteData.candidate[y].Party,
-                        res: result
+                    const finalRes = {
+                        Parties: res,
+                        PreferentialVotes: PreferentialVotes,
                     };
-                    PreferentialVotes.push(resultObj);
+                    return finalRes;
                 }
-                const finalRes = {
-                    Parties: res,
-                    PreferentialVotes: PreferentialVotes
-                };
-                return finalRes;
+            } catch (error) {
+                console.info(error);
+                return error;
             }
-        } catch (error) {
-            console.info(error);
-            return error;
+        } else {
+            //Access denied
+            return false;
         }
     }
 }

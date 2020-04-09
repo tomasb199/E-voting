@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 import ReactTable from "react-table";
 import {
   NotificationContainer,
-  NotificationManager
+  NotificationManager,
 } from "react-notifications";
 import { confirm } from "../../confirmation/confirmation";
 import axios from "axios";
@@ -38,7 +38,7 @@ class Candidates extends Component {
       candidateID: undefined,
       isDowloaded: false,
       publicKey: undefined,
-      loading: false
+      loading: false,
     };
     this.handleOnClickVote = this.handleOnClickVote.bind(this);
     this.output = this.output.bind(this);
@@ -47,8 +47,8 @@ class Candidates extends Component {
   componentDidMount() {
     axios
       .get("http://localhost:8000/voting-app/candidates/")
-      .then(response => response.data)
-      .then(voteData => {
+      .then((response) => response.data)
+      .then((voteData) => {
         this.setState({ voteData });
         this.setState({ candidates: voteData.candidate });
         this.setState({ voteType: voteData.voteType });
@@ -58,8 +58,8 @@ class Candidates extends Component {
 
     axios
       .get("http://localhost:8000/voting-app/getPubKey/")
-      .then(response => response.data)
-      .then(pubKey => {
+      .then((response) => response.data)
+      .then((pubKey) => {
         const publicKey = new paillier.PublicKey(
           bigInt(pubKey.n),
           bigInt(pubKey.g)
@@ -85,9 +85,9 @@ class Candidates extends Component {
       "Confimation your vote"
     ).then(() => {
       console.log("HE Public key:", this.state.publicKey.toString());
-      console.time("encrypt");
       this.setState({ loading: true });
-      var vote = this.state.voteData.candidate.map(candidate => {
+      console.time("encrypt");
+      var vote = this.state.voteData.candidate.map((candidate) => {
         var [cipher, rand] =
           candidate.ID === this.state.candidateID
             ? this.state.publicKey.encrypt(1)
@@ -96,8 +96,8 @@ class Candidates extends Component {
         candidate.vote = cipher;
         return candidate;
       });
-      console.log("rand: ", this.state.verifyCandidates);
       console.timeEnd("encrypt");
+      console.log("rand: ", this.state.verifyCandidates);
       var voteData = this.state.voteData;
       voteData.candidate = vote;
       console.log("Data to sign: ", voteData);
@@ -105,22 +105,22 @@ class Candidates extends Component {
       console.time("verify");
       axios
         .post("http://localhost:5000/verifyVote", voteData)
-        .then(response => {
+        .then((response) => {
+          console.timeEnd("verify");
           if (response.data !== false) {
             NotificationManager.success(
               "Your vote was success signed :-)",
               "SUCCESS!"
             );
-            console.timeEnd("verify");
             const finalVote = response.data;
             finalVote.id = this.state.id;
             console.time("sendVote");
             //Then send signed vote
             axios
               .post("http://localhost:8000/voting-app/vote", finalVote)
-              .then(response => {
-                console.log("Final Vote:", finalVote);
+              .then((response) => {
                 console.timeEnd("sendVote");
+                console.log("Final Vote:", finalVote);
                 if (response.data === true) {
                   this.setState({ isFinish: true });
                   this.state.isFinish = true;
@@ -145,7 +145,7 @@ class Candidates extends Component {
             this.setState({ loading: false });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           NotificationManager.error("Faild :-(", "ERROR!");
           this.setState({ loading: false });
@@ -153,7 +153,7 @@ class Candidates extends Component {
     });
   };
 
-  output = e => {
+  output = (e) => {
     e.preventDefault();
     const id = e.target.value;
     this.setState({ id });
@@ -170,19 +170,19 @@ class Candidates extends Component {
 
   render() {
     const divStyle = {
-      fontWeight: "bold"
+      fontWeight: "bold",
     };
 
     const styleHeader = {
       textAlign: "center",
-      padding: "40px 0"
+      padding: "40px 0",
     };
 
     const columns = [
       {
         Header: "Vote",
         style: styleHeader,
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div className='radio align-middle'>
               <input
@@ -198,21 +198,21 @@ class Candidates extends Component {
         },
         sortable: false,
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "ID",
         accessor: "ID",
         style: styleHeader,
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Photo",
         style: {
-          textAlign: "center"
+          textAlign: "center",
         },
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div>
               <img
@@ -228,13 +228,13 @@ class Candidates extends Component {
         sortable: false,
         maxWidth: 200,
         minWidth: 110,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Name",
         accessor: "Name",
         style: styleHeader,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
 
       {
@@ -242,19 +242,19 @@ class Candidates extends Component {
         accessor: "Description",
         style: styleHeader,
         filterable: false,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Age",
         accessor: "Age",
         style: {
           textAlign: "center",
-          padding: "45px 0"
+          padding: "45px 0",
         },
         maxWidth: 200,
         filterable: false,
-        headerStyle: divStyle
-      }
+        headerStyle: divStyle,
+      },
     ];
 
     return (
@@ -306,7 +306,7 @@ class Candidates extends Component {
           {this.state.isDowloaded && (
             <Redirect
               to={{
-                pathname: "/verify"
+                pathname: "/verify",
               }}
             />
           )}

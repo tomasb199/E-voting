@@ -22,7 +22,7 @@ const ccpPath = path.resolve(
 const ccpJSON = fs.readFileSync(ccpPath, "utf8");
 const ccp = JSON.parse(ccpJSON);
 
-const userName = "votingServer";
+const userName = "verificationServer";
 
 async function main() {
   try {

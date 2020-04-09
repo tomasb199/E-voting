@@ -2,12 +2,12 @@ let network = require("../fabric/network");
 const util = require("util");
 
 //use this identity to query
-const appAdmin = "admin";
+const userName = "votingServer";
 
 module.exports = {
-  candidates: async (req, res, next) => {
+  candidates: async (req, res) => {
     console.log(req.headers);
-    let networkObj = await network.connectToNetwork(appAdmin);
+    let networkObj = await network.connectToNetwork(userName);
     let response = await network.invoke(
       networkObj,
       true,
@@ -19,21 +19,21 @@ module.exports = {
   },
 
   getAllVote: async (req, res) => {
-    let networkObj = await network.connectToNetwork(appAdmin);
+    let networkObj = await network.connectToNetwork(userName);
     let response = await network.invoke(networkObj, true, "queryAllVote", "");
     let parsedResponse = await JSON.parse(response);
     res.send(parsedResponse);
   },
 
   getPubKey: async (req, res) => {
-    let networkObj = await network.connectToNetwork(appAdmin);
+    let networkObj = await network.connectToNetwork(userName);
     let response = await network.invoke(networkObj, true, "getVotingKey", "");
     let parsedResponse = await JSON.parse(response);
     res.send(parsedResponse);
   },
 
   vote: async (req, res) => {
-    let networkObj = await network.connectToNetwork(appAdmin); //TODO:Change to req.body.id
+    let networkObj = await network.connectToNetwork(userName);
     let response = await network.invoke(networkObj, false, "createVote", [
       req.body
     ]);
@@ -46,7 +46,7 @@ module.exports = {
 
   getVote: async (req, res) => {
     console.log(req);
-    let networkObj = await network.connectToNetwork(appAdmin);
+    let networkObj = await network.connectToNetwork(userName);
     let response = await network.invoke(
       networkObj,
       true,
