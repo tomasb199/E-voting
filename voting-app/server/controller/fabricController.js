@@ -41,10 +41,11 @@ module.exports = {
   vote: async (req, res) => {
     let networkObj = await network.connectToNetwork(appAdmin); //TODO:Change to req.body.id
     //console.log('util inspecting\n' + util.inspect(networkObj));
-
+    console.time("Send Vote");
     let response = await network.invoke(networkObj, false, "createVote", [
-      req.body
+      req.body,
     ]);
+    console.timeEnd("Send Vote");
     if (response.error) {
       res.send(response.error);
     } else {
@@ -69,5 +70,5 @@ module.exports = {
     );
     let parsedResponse = await JSON.parse(response);
     res.send(parsedResponse);
-  }
+  },
 };

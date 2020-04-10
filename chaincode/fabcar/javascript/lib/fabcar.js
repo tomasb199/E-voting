@@ -90,13 +90,13 @@ class FabCar extends Contract {
     async createVote(ctx, voteJSON) {
         try {
             const vote = JSON.parse(voteJSON);
-            const as = vote.Proof[0].map(proof => {
+            const as = vote.Proof[0].map((proof) => {
                 return bigInt(proof);
             });
-            const es = vote.Proof[1].map(proof => {
+            const es = vote.Proof[1].map((proof) => {
                 return bigInt(proof);
             });
-            const zs = vote.Proof[2].map(proof => {
+            const zs = vote.Proof[2].map((proof) => {
                 return bigInt(proof);
             });
 
@@ -211,7 +211,7 @@ class FabCar extends Contract {
         });
 
         const res = {
-            res: vote
+            res: vote,
         };
 
         return JSON.stringify(res);
