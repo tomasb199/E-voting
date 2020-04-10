@@ -1,20 +1,19 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const paillier = require("paillier-js");
+const paillier = require("paillier-bignum");
 var bigInt = require("big-integer");
 let network = require("./fabric/network");
 
 const port = 5000;
-const bits = 1024;
+const bits = 2048;
 
 const app = express();
 
 //Body Parser Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-var PrivateKey = undefined,
-  PublicKey = undefined;
+var PrivateKey = undefined;
 var voteData = undefined;
 app.use(cors()); //Cors for use 2 API
 const appAdmin = "admin";
@@ -36,7 +35,7 @@ async function init() {
   //Create structure for sending HE public key
   const publicKeyObj = {
     n: publicKey.n.toString(),
-    g: publicKey.g.toString()
+    g: publicKey.g.toString(),
   };
 
   //Insert to blockchain HE Public Key
@@ -56,30 +55,36 @@ init();
 
 app.get("/getResult", async (req, res) => {
   let networkObj = await network.connectToNetwork(appAdmin);
-  let response = await network.invoke(networkObj, true, "countVote", "");
-  const pom = JSON.parse(JSON.parse(response));
 
+  console.time("Transaction");
+  let response = await network.invoke(networkObj, true, "countVote", "");
+  console.timeEnd("Transaction");
+  const pom = JSON.parse(JSON.parse(response));
+  console.time("Decrypt");
   // Decrypt sum of all votes
   const sum = PrivateKey.decrypt(bigInt(pom.res));
+  console.timeEnd("Decrypt");
   console.log("RESULT: ", sum);
 
+  console.time("Parsing result");
   // Parse sum of all votes to for each candidate
-  const finalResult = voteData.map(function(obj, i, array) {
+  const finalResult = voteData.map(function (obj, i, array) {
     let temp;
     if (i + 1 < array.length) {
       temp = sum
-        .mod(array[i + 1].Record.Vote) //TODO: potreba zmenit na nasledujucu hodnotu
-        .divide(obj.Record.Vote)
+        .mod(array[i + 1].Record.Vote)
+        .div(obj.Record.Vote)
         .toString();
     } else {
-      temp = sum.divide(obj.Record.Vote).toString();
+      temp = sum.div(obj.Record.Vote).toString();
     }
     const result = {
       name: obj.Record.Name,
-      res: temp
+      res: temp,
     };
     return result;
   });
+  console.timeEnd("Parsing result");
   console.log(finalResult);
   res.send(JSON.stringify(finalResult));
 });
