@@ -12,43 +12,45 @@ class ChartsPage extends Component {
       resultNames: [],
       resultNumbers: [],
       resultNumbersPercent: [],
-      loading: true
+      loading: true,
     };
   }
 
   async componentDidMount() {
     axios
       .get("http://localhost:8000/voting-app/candidates/")
-      .then(response => response.data)
-      .then(candidates => {
-        const labels = candidates.map(function(obj) {
+      .then((response) => response.data)
+      .then((candidates) => {
+        const labels = candidates.map(function (obj) {
           return obj.Record.Name;
         });
         this.setState({ labels });
         console.log(this.state.labels);
+        console.time("decrypt");
       })
       .then(
         axios
           .get("http://localhost:5000/getResult/")
-          .then(response => response.data)
-          .then(result => {
+          .then((response) => response.data)
+          .then((result) => {
+            console.timeEnd("decrypt");
             this.setState({ result });
             console.log("Result:", this.state.result);
 
-            result.sort(function(a, b) {
+            result.sort(function (a, b) {
               return -(a.res - b.res || a.name.localeCompare(b.name));
             });
-            const resultNumbers = result.map(candidate => {
+            const resultNumbers = result.map((candidate) => {
               return candidate.res;
             });
             this.setState({ resultNumbers });
-            const resultNames = result.map(candidate => {
+            const resultNames = result.map((candidate) => {
               return candidate.name;
             });
             this.setState({ resultNames });
 
             const sum = resultNumbers.reduce((a, b) => Number(a) + Number(b));
-            const resultNumbersPercent = resultNumbers.map(item => {
+            const resultNumbersPercent = resultNumbers.map((item) => {
               return ((100 * Number(item)) / sum).toFixed(2);
             });
             console.log(resultNumbersPercent);
@@ -72,7 +74,7 @@ class ChartsPage extends Component {
               "rgba(255, 218, 128,0.4)",
               "rgba(113, 205, 205,0.4)",
               "rgba(170, 128, 252,0.4)",
-              "rgba(255, 177, 101,0.4)"
+              "rgba(255, 177, 101,0.4)",
             ],
             borderWidth: 2,
             borderColor: [
@@ -81,10 +83,10 @@ class ChartsPage extends Component {
               "rgba(255, 218, 128, 1)",
               "rgba(113, 205, 205, 1)",
               "rgba(170, 128, 252, 1)",
-              "rgba(255, 177, 101, 1)"
-            ]
-          }
-        ]
+              "rgba(255, 177, 101, 1)",
+            ],
+          },
+        ],
       },
       dataPie = {
         labels: this.state.resultNames,
@@ -97,7 +99,7 @@ class ChartsPage extends Component {
               "rgba(255, 218, 128,0.4)",
               "rgba(113, 205, 205,0.4)",
               "rgba(170, 128, 252,0.4)",
-              "rgba(255, 177, 101,0.4)"
+              "rgba(255, 177, 101,0.4)",
             ],
             borderColor: [
               "rgba(255, 134, 159, 1)",
@@ -105,10 +107,10 @@ class ChartsPage extends Component {
               "rgba(255, 218, 128, 1)",
               "rgba(113, 205, 205, 1)",
               "rgba(170, 128, 252, 1)",
-              "rgba(255, 177, 101, 1)"
-            ]
-          }
-        ]
+              "rgba(255, 177, 101, 1)",
+            ],
+          },
+        ],
       },
       barChartOptions = {
         responsive: true,
@@ -119,22 +121,22 @@ class ChartsPage extends Component {
               barPercentage: 1,
               gridLines: {
                 display: false,
-                color: "rgba(0, 0, 0, 0.1)"
-              }
-            }
+                color: "rgba(0, 0, 0, 0.1)",
+              },
+            },
           ],
           yAxes: [
             {
               gridLines: {
                 display: true,
-                color: "rgba(0, 0, 0, 0.1)"
+                color: "rgba(0, 0, 0, 0.1)",
               },
               ticks: {
-                beginAtZero: true
-              }
-            }
-          ]
-        }
+                beginAtZero: true,
+              },
+            },
+          ],
+        },
       };
 
     return (

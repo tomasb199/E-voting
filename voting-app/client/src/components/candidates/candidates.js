@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 import ReactTable from "react-table";
 import {
   NotificationContainer,
-  NotificationManager
+  NotificationManager,
 } from "react-notifications";
 import { confirm } from "../confirmation/confirmation";
 import axios from "axios";
@@ -40,7 +40,7 @@ class Candidates extends Component {
       isDowloaded: false,
       validScores: [],
       publicKey: undefined,
-      loading: false
+      loading: false,
     };
     this.handleOnClickVote = this.handleOnClickVote.bind(this);
     this.output = this.output.bind(this);
@@ -49,11 +49,11 @@ class Candidates extends Component {
   componentDidMount() {
     axios
       .get("http://localhost:8000/voting-app/candidates/")
-      .then(response => response.data)
-      .then(candidates => {
+      .then((response) => response.data)
+      .then((candidates) => {
         this.setState({ candidates });
         console.log("Candidates:", this.state.candidates);
-        const validScores = candidates.map(function(obj) {
+        const validScores = candidates.map(function (obj) {
           return obj.Record.Vote;
         });
         this.setState({ validScores });
@@ -62,8 +62,8 @@ class Candidates extends Component {
 
     axios
       .get("http://localhost:8000/voting-app/getPubKey/")
-      .then(response => response.data)
-      .then(pubKey => {
+      .then((response) => response.data)
+      .then((pubKey) => {
         this.setState({ pubKey });
         const publicKey = new paillier.PublicKey(
           bigInt(pubKey.n),
@@ -75,8 +75,8 @@ class Candidates extends Component {
 
     axios
       .get("http://localhost:8000/voting-app/getBits/")
-      .then(response => response.data)
-      .then(bits => {
+      .then((response) => response.data)
+      .then((bits) => {
         this.setState({ bits });
         console.log("Bits:", this.state.bits);
       });
@@ -112,8 +112,8 @@ class Candidates extends Component {
           this.state.bits
         );
         console.log(proof);
-        proof.forEach(proof => {
-          proof.forEach(element => {
+        proof.forEach((proof) => {
+          proof.forEach((element) => {
             if (element < 0) {
               temp = true;
             }
@@ -126,14 +126,14 @@ class Candidates extends Component {
       var vote = {
         id: this.state.id,
         Vote: cipher,
-        Proof: proof
+        Proof: proof,
       };
       console.log(this.state.voteName);
       console.log(vote);
       console.time("verify");
       axios
         .post("http://localhost:8000/voting-app/vote", vote)
-        .then(response => {
+        .then((response) => {
           console.log(response);
           if (response.data === true) {
             this.setState({ isFinish: true });
@@ -146,7 +146,7 @@ class Candidates extends Component {
             this.setState({ loading: false });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           NotificationManager.error("Faild :-(", "ERROR!");
           this.setState({ loading: false });
@@ -154,7 +154,7 @@ class Candidates extends Component {
     });
   };
 
-  output = e => {
+  output = (e) => {
     e.preventDefault();
     const id = e.target.value;
     this.setState({ id });
@@ -167,23 +167,9 @@ class Candidates extends Component {
     );
   };
 
-  /*downloadTxtFile = async () => {
-      const element = document.createElement("a");
-      const file = new Blob([JSON.stringify(vote)], {
-        type: "text/plain"
-      });
-      element.href = URL.createObjectURL(file);
-      element.download = "myFile.txt";
-      document.body.appendChild(element); // Required for this to work in FireFox
-      element.click();
-      this.setState({ loading: false });
-    });
-  };
-  */
-
   render() {
     const divStyle = {
-      fontWeight: "bold"
+      fontWeight: "bold",
     };
 
     const columns = [
@@ -191,9 +177,9 @@ class Candidates extends Component {
         Header: "Vote",
         style: {
           textAlign: "center",
-          padding: "40px 0"
+          padding: "40px 0",
         },
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div className='radio align-middle'>
               <input
@@ -210,24 +196,24 @@ class Candidates extends Component {
         },
         sortable: false,
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "ID",
         accessor: "Record.ID",
         style: {
           textAlign: "center",
-          padding: "40px 0"
+          padding: "40px 0",
         },
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Photo",
         style: {
-          textAlign: "center"
+          textAlign: "center",
         },
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div>
               <img
@@ -243,16 +229,16 @@ class Candidates extends Component {
         sortable: false,
         maxWidth: 200,
         minWidth: 110,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Name",
         accessor: "Record.Name",
         style: {
           textAlign: "center",
-          padding: "40px 0"
+          padding: "40px 0",
         },
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
 
       {
@@ -260,22 +246,22 @@ class Candidates extends Component {
         accessor: "Record.Description",
         style: {
           textAlign: "center",
-          padding: "40px 0"
+          padding: "40px 0",
         },
         filterable: false,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Age",
         accessor: "Record.Age",
         style: {
           textAlign: "center",
-          padding: "45px 0"
+          padding: "45px 0",
         },
         maxWidth: 200,
         filterable: false,
-        headerStyle: divStyle
-      }
+        headerStyle: divStyle,
+      },
     ];
 
     return (
@@ -288,8 +274,9 @@ class Candidates extends Component {
           <InputID output={this.output} />
           <ReactTable
             className='-striped -highlight'
-            defaultPageSize={5}
+            //defaultPageSize={5}
             minRows={1}
+            showPagination={false}
             columns={columns}
             data={this.state.candidates}
           ></ReactTable>
@@ -321,7 +308,7 @@ class Candidates extends Component {
           {this.state.isDowloaded && (
             <Redirect
               to={{
-                pathname: "/verify"
+                pathname: "/verify",
               }}
             />
           )}
