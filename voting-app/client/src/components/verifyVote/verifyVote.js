@@ -6,7 +6,7 @@ import FileReader from "../fileReader/fileReader";
 import ReactTable from "react-table";
 import {
   NotificationContainer,
-  NotificationManager
+  NotificationManager,
 } from "react-notifications";
 import axios from "axios";
 
@@ -22,18 +22,18 @@ class VerifyVote extends Component {
       random: undefined,
       Vote: undefined,
       currentVote: undefined,
-      publicKey: undefined
+      publicKey: undefined,
     };
   }
 
   componentDidMount() {
     axios
       .get("http://localhost:8000/voting-app/candidates/")
-      .then(response => response.data)
-      .then(candidates => {
+      .then((response) => response.data)
+      .then((candidates) => {
         this.setState({ candidates });
         console.log("Candidates:", this.state.candidates);
-        this.state.validScores = candidates.map(function(obj) {
+        this.state.validScores = candidates.map(function (obj) {
           return obj.Record.Vote;
         });
         console.log("Valid scores: ", this.state.validScores);
@@ -41,14 +41,14 @@ class VerifyVote extends Component {
 
     axios
       .get("http://localhost:8000/voting-app/getPubKey/")
-      .then(response => response.data)
-      .then(pubKey => {
+      .then((response) => response.data)
+      .then((pubKey) => {
         this.setState({ pubKey });
         console.log("Public Key:", this.state.pubKey);
       });
   }
 
-  handleForce = data => {
+  handleForce = (data) => {
     if (!isNaN(data[0][0]) && !isNaN(data[1][0])) {
       this.state.id = data[0][0];
       this.state.random = data[1][0];
@@ -57,10 +57,10 @@ class VerifyVote extends Component {
       axios
         .get("http://localhost:8000/voting-app/getVote", {
           params: {
-            ID: this.state.id
-          }
+            ID: this.state.id,
+          },
         })
-        .then(response => {
+        .then((response) => {
           this.setState({ Vote: response.data.Vote });
           console.log("Vote:" + this.state.Vote);
           NotificationManager.success(
@@ -68,10 +68,10 @@ class VerifyVote extends Component {
             "Success!"
           );
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
     } else {
@@ -113,7 +113,7 @@ class VerifyVote extends Component {
 
   render() {
     const divStyle = {
-      fontWeight: "bold"
+      fontWeight: "bold",
     };
 
     const columns = [
@@ -121,9 +121,9 @@ class VerifyVote extends Component {
         Header: "Vote",
         style: {
           textAlign: "center",
-          padding: "40px 0"
+          padding: "40px 0",
         },
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div className='radio'>
               <label>
@@ -142,24 +142,24 @@ class VerifyVote extends Component {
         width: 75,
         maxWidth: 75,
         minWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "ID",
         accessor: "Record.ID",
         style: {
           textAlign: "center",
-          padding: "40px 0"
+          padding: "40px 0",
         },
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Photo",
         style: {
-          textAlign: "center"
+          textAlign: "center",
         },
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div>
               <img
@@ -175,16 +175,16 @@ class VerifyVote extends Component {
         sortable: false,
         maxWidth: 200,
         minWidth: 110,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Name",
         accessor: "Record.Name",
         style: {
           textAlign: "center",
-          padding: "40px 0"
+          padding: "40px 0",
         },
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
 
       {
@@ -192,22 +192,22 @@ class VerifyVote extends Component {
         accessor: "Record.Description",
         style: {
           textAlign: "center",
-          padding: "40px 0"
+          padding: "40px 0",
         },
         filterable: false,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Age",
         accessor: "Record.Age",
         style: {
           textAlign: "center",
-          padding: "45px 0"
+          padding: "45px 0",
         },
         maxWidth: 200,
         filterable: false,
-        headerStyle: divStyle
-      }
+        headerStyle: divStyle,
+      },
     ];
 
     return (
@@ -221,7 +221,7 @@ class VerifyVote extends Component {
         <br />
         <ReactTable
           className='-striped -highlight'
-          defaultPageSize={5}
+          showPagination={false}
           minRows={1}
           columns={columns}
           data={this.state.candidates}
