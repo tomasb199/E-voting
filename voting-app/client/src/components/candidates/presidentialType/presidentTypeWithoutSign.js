@@ -267,7 +267,7 @@ class Candidates extends Component {
           <InputID output={this.output} />
           <ReactTable
             className='-striped -highlight'
-            defaultPageSize={5}
+            showPagination={false}
             minRows={1}
             columns={columns}
             data={this.state.candidates}

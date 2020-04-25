@@ -7,7 +7,7 @@ import FileReader from "../../fileReader/fileReader";
 import ReactTable from "react-table";
 import {
   NotificationContainer,
-  NotificationManager
+  NotificationManager,
 } from "react-notifications";
 import axios from "axios";
 
@@ -25,15 +25,15 @@ class VerifyPresidentialType extends Component {
       Vote: undefined,
       currentVote: undefined,
       publicKey: undefined,
-      voteType: undefined
+      voteType: undefined,
     };
   }
 
   componentDidMount() {
     axios
       .get("http://localhost:8000/voting-app/candidates/")
-      .then(response => response.data)
-      .then(voteData => {
+      .then((response) => response.data)
+      .then((voteData) => {
         this.setState({ voteData });
         this.setState({ candidates: voteData.candidate });
         this.setState({ voteType: voteData.voteType });
@@ -49,8 +49,8 @@ class VerifyPresidentialType extends Component {
 
     axios
       .get("http://localhost:8000/voting-app/getPubKey/")
-      .then(response => response.data)
-      .then(pubKey => {
+      .then((response) => response.data)
+      .then((pubKey) => {
         const publicKey = new paillier.PublicKey(
           bigInt(pubKey.n),
           bigInt(pubKey.g)
@@ -60,7 +60,7 @@ class VerifyPresidentialType extends Component {
       });
   }
 
-  handleForce = data => {
+  handleForce = (data) => {
     if (this.state.voteType === 1) {
       if (
         !isNaN(data[0][0]) &&
@@ -71,10 +71,10 @@ class VerifyPresidentialType extends Component {
         axios
           .get("http://localhost:8000/voting-app/getVote", {
             params: {
-              ID: this.state.id
-            }
+              ID: this.state.id,
+            },
           })
-          .then(response => {
+          .then((response) => {
             this.setState({ Vote: response.data.candidate });
             console.log("Vote:" + this.state.Vote);
             NotificationManager.success(
@@ -82,10 +82,10 @@ class VerifyPresidentialType extends Component {
               "Success!"
             );
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.log(error);
           })
-          .then(function() {
+          .then(function () {
             // always executed
           });
       }
@@ -138,19 +138,19 @@ class VerifyPresidentialType extends Component {
 
   render() {
     const divStyle = {
-      fontWeight: "bold"
+      fontWeight: "bold",
     };
 
     const styleHeader = {
       textAlign: "center",
-      padding: "40px 0"
+      padding: "40px 0",
     };
 
     const columns = [
       {
         Header: "Vote",
         style: styleHeader,
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div className='radio align-middle'>
               <input
@@ -166,21 +166,21 @@ class VerifyPresidentialType extends Component {
         },
         sortable: false,
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "ID",
         accessor: "ID",
         style: styleHeader,
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Photo",
         style: {
-          textAlign: "center"
+          textAlign: "center",
         },
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div>
               <img
@@ -196,32 +196,32 @@ class VerifyPresidentialType extends Component {
         sortable: false,
         maxWidth: 200,
         minWidth: 110,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Name",
         accessor: "Name",
         style: styleHeader,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Party",
         accessor: "Description",
         style: styleHeader,
         filterable: false,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Age",
         accessor: "Age",
         style: {
           textAlign: "center",
-          padding: "45px 0"
+          padding: "45px 0",
         },
         maxWidth: 200,
         filterable: false,
-        headerStyle: divStyle
-      }
+        headerStyle: divStyle,
+      },
     ];
 
     return (
@@ -246,7 +246,7 @@ class VerifyPresidentialType extends Component {
               <br />
               <ReactTable
                 className='-striped -highlight'
-                defaultPageSize={5}
+                showPagination={false}
                 minRows={1}
                 columns={columns}
                 data={this.state.candidates}

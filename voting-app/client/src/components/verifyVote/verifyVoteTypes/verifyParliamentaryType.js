@@ -8,7 +8,7 @@ import Dropdown from "react-dropdown";
 import ReactTable from "react-table";
 import {
   NotificationContainer,
-  NotificationManager
+  NotificationManager,
 } from "react-notifications";
 import Spinner from "../../loading-spinner/loading-spinner";
 import axios from "axios";
@@ -31,7 +31,7 @@ class VerifyParliamentaryType extends Component {
       voteType: undefined,
       selectedParty: undefined,
       inputData: {},
-      loading: false
+      loading: false,
     };
     this.verify = this.verify.bind();
   }
@@ -39,8 +39,8 @@ class VerifyParliamentaryType extends Component {
   componentDidMount() {
     axios
       .get("http://localhost:8000/voting-app/candidates/")
-      .then(response => response.data)
-      .then(voteData => {
+      .then((response) => response.data)
+      .then((voteData) => {
         this.setState({ voteData });
         this.setState({ candidates: voteData.candidate });
         this.setState({ voteType: voteData.voteType });
@@ -51,8 +51,8 @@ class VerifyParliamentaryType extends Component {
 
     axios
       .get("http://localhost:8000/voting-app/getPubKey/")
-      .then(response => response.data)
-      .then(pubKey => {
+      .then((response) => response.data)
+      .then((pubKey) => {
         const publicKey = new paillier.PublicKey(
           bigInt(pubKey.n),
           bigInt(pubKey.g)
@@ -62,7 +62,7 @@ class VerifyParliamentaryType extends Component {
       });
   }
 
-  handleForce = data => {
+  handleForce = (data) => {
     console.log("Input data: ", JSON.parse(data));
     this.setState({ inputData: JSON.parse(data) });
     this.setState({ id: this.state.inputData.id });
@@ -70,12 +70,12 @@ class VerifyParliamentaryType extends Component {
     axios
       .get("http://localhost:8000/voting-app/getVote", {
         params: {
-          ID: this.state.inputData.id
-        }
+          ID: this.state.inputData.id,
+        },
       })
-      .then(response => {
+      .then((response) => {
         this.setState({
-          Vote: JSON.parse(JSON.stringify(response.data.candidate))
+          Vote: JSON.parse(JSON.stringify(response.data.candidate)),
         });
         console.log("Old vote: ", this.state.Vote);
         NotificationManager.success(
@@ -83,7 +83,7 @@ class VerifyParliamentaryType extends Component {
           "Success!"
         );
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.log(error);
       });
   };
@@ -174,9 +174,9 @@ class VerifyParliamentaryType extends Component {
     }
   };
 
-  selectParty = input => {
+  selectParty = (input) => {
     const selectedParty = this.state.candidates.find(
-      item => item.ID == input.value
+      (item) => item.ID == input.value
     );
     this.setState({ selectedPartyCandidates: selectedParty.Candidates });
     //Reset selected candidates array
@@ -189,18 +189,18 @@ class VerifyParliamentaryType extends Component {
 
   render() {
     const divStyle = {
-      fontWeight: "bold"
+      fontWeight: "bold",
     };
 
     const styleCenter = {
-      textAlign: "center"
+      textAlign: "center",
     };
 
     const columns = [
       {
         Header: "Vote",
         style: styleCenter,
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div className='radio align-middle'>
               <input
@@ -211,7 +211,7 @@ class VerifyParliamentaryType extends Component {
                     .state.candidatesID[Number(props.original.ID)];
 
                   if (
-                    this.state.candidatesID.filter(x => x === true).length >
+                    this.state.candidatesID.filter((x) => x === true).length >
                     this.state.voteData.maxVote
                   ) {
                     NotificationManager.error(
@@ -226,24 +226,24 @@ class VerifyParliamentaryType extends Component {
         },
         sortable: false,
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "ID",
         accessor: "ID",
         style: styleCenter,
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Name",
         accessor: "Name",
         style: styleCenter,
-        headerStyle: divStyle
-      }
+        headerStyle: divStyle,
+      },
     ];
 
-    var Party = this.state.candidates.map(candidate => {
+    var Party = this.state.candidates.map((candidate) => {
       return { value: candidate.ID, label: candidate.Party };
     });
 
@@ -274,7 +274,7 @@ class VerifyParliamentaryType extends Component {
                 <b className='font-weight-bold'>Select candidates</b>
                 <ReactTable
                   className='-striped -highlight'
-                  defaultPageSize={150}
+                  showPagination={false}
                   minRows={1}
                   columns={columns}
                   data={this.state.selectedPartyCandidates}

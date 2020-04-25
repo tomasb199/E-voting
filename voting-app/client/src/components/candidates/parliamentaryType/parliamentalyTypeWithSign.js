@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import ReactTable from "react-table";
 import {
   NotificationContainer,
-  NotificationManager
+  NotificationManager,
 } from "react-notifications";
 import { confirm } from "../../confirmation/confirmation";
 import axios from "axios";
@@ -37,7 +37,7 @@ class Candidates extends Component {
       selectedPartyCandidates: [],
       selectedPartyValue: "Select a party",
       publicKey: undefined,
-      loading: false
+      loading: false,
     };
     this.handleOnClickVote = this.handleOnClickVote.bind(this);
   }
@@ -45,8 +45,8 @@ class Candidates extends Component {
   componentDidMount() {
     axios
       .get("http://localhost:8000/voting-app/candidates/")
-      .then(response => response.data)
-      .then(voteData => {
+      .then((response) => response.data)
+      .then((voteData) => {
         this.setState({ voteData });
         this.setState({ candidates: voteData.candidate });
         this.setState({ voteType: voteData.voteType });
@@ -57,8 +57,8 @@ class Candidates extends Component {
 
     axios
       .get("http://localhost:8000/voting-app/getPubKey/")
-      .then(response => response.data)
-      .then(pubKey => {
+      .then((response) => response.data)
+      .then((pubKey) => {
         const publicKey = new paillier.PublicKey(
           bigInt(pubKey.n),
           bigInt(pubKey.g)
@@ -70,7 +70,7 @@ class Candidates extends Component {
 
   handleOnClickVote = async () => {
     if (
-      this.state.candidatesID.filter(x => x === true).length >
+      this.state.candidatesID.filter((x) => x === true).length >
       this.state.voteData.maxVote
     ) {
       NotificationManager.error("To many selected candidates!", "ERROR!");
@@ -102,7 +102,7 @@ class Candidates extends Component {
         let randCandidates = {
           candidate: [],
           voteType: this.state.voteData.voteType,
-          maxVote: this.state.maxVote
+          maxVote: this.state.maxVote,
         };
         let candidate = this.state.candidates.map((candidate, index) => {
           if (candidate.ID === partyVote) {
@@ -111,7 +111,7 @@ class Candidates extends Component {
               ID: candidate.ID,
               Party: candidate.Party,
               rand,
-              Candidates: []
+              Candidates: [],
             };
             randCandidates.candidate.push(party);
             candidate.vote = cipher;
@@ -122,7 +122,7 @@ class Candidates extends Component {
               ID: candidate.ID,
               Party: candidate.Party,
               rand,
-              Candidates: []
+              Candidates: [],
             };
             randCandidates.candidate.push(party);
             candidate.vote = cipher;
@@ -131,13 +131,13 @@ class Candidates extends Component {
         });
         for (let i = 0; i < candidate.length; i++) {
           const id = candidate[i].ID;
-          candidate[i].Candidates = candidate[i].Candidates.map(candidate => {
+          candidate[i].Candidates = candidate[i].Candidates.map((candidate) => {
             if (id === partyVote && preferentialVote.includes(candidate.ID)) {
               var [cipher, rand] = publicKey.encrypt(1);
               const PreferentialVotesRand = {
                 ID: candidate.ID,
                 Name: candidate.Name,
-                rand
+                rand,
               };
               randCandidates.candidate[i].Candidates.push(
                 PreferentialVotesRand
@@ -149,7 +149,7 @@ class Candidates extends Component {
               const PreferentialVotesRand = {
                 ID: candidate.ID,
                 Name: candidate.Name,
-                rand
+                rand,
               };
               randCandidates.candidate[i].Candidates.push(
                 PreferentialVotesRand
@@ -169,7 +169,7 @@ class Candidates extends Component {
         console.time("verify");
         axios
           .post("http://localhost:5000/verifyVote", voteData)
-          .then(response => {
+          .then((response) => {
             if (response.data !== false) {
               NotificationManager.success(
                 "Your vote was success signed :-)",
@@ -182,7 +182,7 @@ class Candidates extends Component {
               //Then send signed vote
               axios
                 .post("http://localhost:8080/voting-app/sendVote", finalVote)
-                .then(response => {
+                .then((response) => {
                   localStorage.setItem(
                     "votingData",
                     JSON.stringify(this.state.verifyCandidates)
@@ -199,7 +199,7 @@ class Candidates extends Component {
               this.setState({ loading: false });
             }
           })
-          .catch(error => {
+          .catch((error) => {
             console.log(error);
             NotificationManager.error("Faild :-(", "ERROR!");
             this.setState({ loading: false });
@@ -208,9 +208,9 @@ class Candidates extends Component {
     });
   };
 
-  selectParty = input => {
+  selectParty = (input) => {
     const selectedParty = this.state.candidates.find(
-      item => item.ID == input.value
+      (item) => item.ID == input.value
     );
     this.setState({ selectedPartyCandidates: selectedParty.Candidates });
 
@@ -224,18 +224,18 @@ class Candidates extends Component {
 
   render() {
     const divStyle = {
-      fontWeight: "bold"
+      fontWeight: "bold",
     };
 
     const styleCenter = {
-      textAlign: "center"
+      textAlign: "center",
     };
 
     const columns = [
       {
         Header: "Vote",
         style: styleCenter,
-        Cell: props => {
+        Cell: (props) => {
           return (
             <div className='radio align-middle'>
               <input
@@ -246,7 +246,7 @@ class Candidates extends Component {
                     .state.candidatesID[Number(props.original.ID)];
 
                   if (
-                    this.state.candidatesID.filter(x => x === true).length >
+                    this.state.candidatesID.filter((x) => x === true).length >
                     this.state.voteData.maxVote
                   ) {
                     NotificationManager.error(
@@ -261,24 +261,24 @@ class Candidates extends Component {
         },
         sortable: false,
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "ID",
         accessor: "ID",
         style: styleCenter,
         maxWidth: 75,
-        headerStyle: divStyle
+        headerStyle: divStyle,
       },
       {
         Header: "Name",
         accessor: "Name",
         style: styleCenter,
-        headerStyle: divStyle
-      }
+        headerStyle: divStyle,
+      },
     ];
 
-    var Party = this.state.candidates.map(candidate => {
+    var Party = this.state.candidates.map((candidate) => {
       return { value: candidate.ID, label: candidate.Party };
     });
 
@@ -308,7 +308,7 @@ class Candidates extends Component {
               <b className='font-weight-bold'>Select candidates</b>
               <ReactTable
                 className='-striped -highlight'
-                defaultPageSize={150}
+                showPagination={false}
                 minRows={1}
                 columns={columns}
                 data={this.state.selectedPartyCandidates}
