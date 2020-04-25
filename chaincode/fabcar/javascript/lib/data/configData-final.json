@@ -1,0 +1,33 @@
+{
+    "voteType": 1,
+    "candidate": [
+        {
+            "ID": "1",
+            "Name": "Candidate1",
+            "Description": "Party1",
+            "Foto": "https://i.imgur.com/GpSFdo5.png",
+            "Age": "55"
+        },
+        {
+            "ID": "2",
+            "Name": "Candidate2",
+            "Description": "Party2",
+            "Foto": "https://i.imgur.com/NlLPYjp.png",
+            "Age": "88"
+        },
+        {
+            "ID": "3",
+            "Name": "Candidate3",
+            "Description": "Party3",
+            "Foto": "https://i.imgur.com/VCeXa58.png",
+            "Age": "60"
+        },
+        {
+            "ID": "4",
+            "Name": "Candidate4",
+            "Description": "Party4",
+            "Foto": "https://i.imgur.com/f0Z3zcb.png",
+            "Age": "24"
+        }
+    ]
+}
