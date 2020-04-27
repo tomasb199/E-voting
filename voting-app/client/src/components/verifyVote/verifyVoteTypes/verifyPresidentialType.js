@@ -11,7 +11,7 @@ import {
 } from "react-notifications";
 import axios from "axios";
 
-const paillier = require("paillier-js");
+const paillier = require("../../lib/paillier-modul/index.js");
 var bigInt = require("big-integer");
 
 class VerifyPresidentialType extends Component {

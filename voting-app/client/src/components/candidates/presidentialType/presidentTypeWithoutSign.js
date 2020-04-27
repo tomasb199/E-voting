@@ -22,7 +22,7 @@ import "../candidates.css";
 
 import { properties } from "../properties.js";
 
-const paillier = require("paillier-js");
+const paillier = require("../../lib/paillier-modul/index.js");
 var bigInt = require("big-integer");
 
 class Candidates extends Component {

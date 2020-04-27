@@ -13,7 +13,7 @@ import {
 import Spinner from "../../loading-spinner/loading-spinner";
 import axios from "axios";
 
-const paillier = require("paillier-js");
+const paillier = require("../../lib/paillier-modul/index.js");
 var bigInt = require("big-integer");
 
 class VerifyParliamentaryType extends Component {
@@ -98,9 +98,7 @@ class VerifyParliamentaryType extends Component {
     } else {
       this.setState({ loading: true });
       setTimeout(() => {
-        const g = this.state.publicKey.g;
-        const n = this.state.publicKey.n;
-        const _n2 = this.state.publicKey._n2;
+        const { g, n, _n2 } = this.state.publicKey;
 
         console.log("Selected party: ", this.state.selectedParty);
         const preferentialVote = this.state.candidatesID
@@ -111,45 +109,43 @@ class VerifyParliamentaryType extends Component {
         console.time("verifyTime");
 
         let isValid = true;
+        let newCipher;
         this.state.candidates.forEach((item, i) => {
-          //this random
-          const r = bigInt(this.state.inputData.candidates.candidate[i].rand);
-          //current vote
-          const currentVote =
-            item.ID === this.state.selectedParty.value ? bigInt(1) : bigInt(0);
-          //new cipher
-          const newCipher = g
-            .modPow(currentVote, _n2)
-            .multiply(r.modPow(n, _n2))
-            .mod(_n2);
-          //is equal like original
-          if (!newCipher.eq(this.state.Vote[i].vote)) {
-            isValid = false;
-          }
-          item.Candidates.forEach((candidatesInParty, y) => {
-            //this random preferential vote
-            const r = bigInt(
-              this.state.inputData.candidates.candidate[i].Candidates[y].rand
-            );
-            //current vote preferential votes
-            let currentVote;
-            if (item.ID === this.state.selectedParty.value) {
-              currentVote = preferentialVote.includes(candidatesInParty.ID)
+          if (isValid) {
+            //this random
+            const r = bigInt(this.state.inputData.candidates.candidate[i].rand);
+            const currentVote =
+              item.ID === this.state.selectedParty.value
                 ? bigInt(1)
                 : bigInt(0);
-            } else {
-              currentVote = bigInt(0);
-            }
-            const newCipher = g
-              .modPow(currentVote, _n2)
-              .multiply(r.modPow(n, _n2))
-              .mod(_n2);
+            [newCipher] = this.state.publicKey.encrypt(currentVote, r);
             //is equal like original
-            if (!newCipher.eq(this.state.Vote[i].Candidates[y].vote)) {
+            if (!newCipher.eq(this.state.Vote[i].vote)) {
               isValid = false;
-              console.log(i, y);
             }
-          });
+          }
+          if (isValid) {
+            item.Candidates.forEach((candidatesInParty, y) => {
+              //this random preferential vote
+              const r = bigInt(
+                this.state.inputData.candidates.candidate[i].Candidates[y].rand
+              );
+              //current preferential vote
+              let currentVote;
+              if (item.ID === this.state.selectedParty.value) {
+                currentVote = preferentialVote.includes(candidatesInParty.ID)
+                  ? bigInt(1)
+                  : bigInt(0);
+              } else {
+                currentVote = bigInt(0);
+              }
+              [newCipher] = this.state.publicKey.encrypt(currentVote, r);
+              //is equal like original
+              if (!newCipher.eq(this.state.Vote[i].Candidates[y].vote)) {
+                isValid = false;
+              }
+            });
+          }
         });
         setTimeout(() => {
           this.setState({ loading: false });
