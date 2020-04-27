@@ -8,6 +8,7 @@
 
 const shim = require("fabric-shim");
 const { Contract } = require("fabric-contract-api");
+const ClientIdentity = require("fabric-shim").ClientIdentity;
 const { verifyProof } = require("paillier-in-set-zkp");
 const paillier = require("paillier-js");
 var bigInt = require("big-integer");
@@ -61,19 +62,33 @@ class FabCar extends Contract {
     }
 
     async sendVotingKey(ctx, publicKey) {
-        const key = JSON.parse(publicKey);
-        await ctx.stub.putState(
-            "HEPublicKey",
-            Buffer.from(JSON.stringify(key))
-        );
-        PublicKey = new paillier.PublicKey(bigInt(key.n), bigInt(key.g));
-        return true;
+        // access has only verification server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "verificationServer")) {
+            const key = JSON.parse(publicKey);
+            await ctx.stub.putState(
+                "HEPublicKey",
+                Buffer.from(JSON.stringify(key))
+            );
+            PublicKey = new paillier.PublicKey(bigInt(key.n), bigInt(key.g));
+            return true;
+        } else {
+            //Access denied
+            return false;
+        }
     }
 
     async sendVotingKeyBits(ctx, bits) {
-        bit = JSON.parse(bits);
-        await ctx.stub.putState("bits", Buffer.from(JSON.stringify(bit)));
-        return true;
+        // access has only verification server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "verificationServer")) {
+            bit = JSON.parse(bits);
+            await ctx.stub.putState("bits", Buffer.from(JSON.stringify(bit)));
+            return true;
+        } else {
+            //Access denied
+            return false;
+        }
     }
 
     async getBits(ctx) {
@@ -88,46 +103,60 @@ class FabCar extends Contract {
     }
 
     async createVote(ctx, voteJSON) {
-        try {
-            const vote = JSON.parse(voteJSON);
-            const as = vote.Proof[0].map((proof) => {
-                return bigInt(proof);
-            });
-            const es = vote.Proof[1].map((proof) => {
-                return bigInt(proof);
-            });
-            const zs = vote.Proof[2].map((proof) => {
-                return bigInt(proof);
-            });
+        // access has only voting server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "votingServer")) {
+            try {
+                const vote = JSON.parse(voteJSON);
+                const as = vote.Proof[0].map((proof) => {
+                    return bigInt(proof);
+                });
+                const es = vote.Proof[1].map((proof) => {
+                    return bigInt(proof);
+                });
+                const zs = vote.Proof[2].map((proof) => {
+                    return bigInt(proof);
+                });
 
-            if (
-                verifyProof(
-                    PublicKey,
-                    bigInt(vote.Vote),
-                    [as, es, zs],
-                    validCandidates
-                )
-            ) {
-                const buffer = Buffer.from(JSON.stringify(vote));
-                await ctx.stub.putState("VOTE" + vote.id, buffer);
-                return true;
-            } else {
-                return false;
+                if (
+                    verifyProof(
+                        PublicKey,
+                        bigInt(vote.Vote),
+                        [as, es, zs],
+                        validCandidates
+                    )
+                ) {
+                    const buffer = Buffer.from(JSON.stringify(vote));
+                    await ctx.stub.putState("VOTE" + vote.id, buffer);
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (err) {
+                return shim.error(err);
             }
-        } catch (err) {
-            return shim.error(err);
+        } else {
+            //Access denied
+            return false;
         }
     }
 
     async readVote(ctx, voteId) {
-        const voteID_final = "VOTE" + voteId.toString();
-        const exists = await this.dataExists(ctx, voteID_final);
-        if (!exists) {
-            throw new Error(`The vote ${voteId} does not exist`);
+        // access has only voting server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "votingServer")) {
+            const voteID_final = "VOTE" + voteId.toString();
+            const exists = await this.dataExists(ctx, voteID_final);
+            if (!exists) {
+                throw new Error(`The vote ${voteId} does not exist`);
+            }
+            const buffer = await ctx.stub.getState(voteID_final);
+            const asset = JSON.parse(buffer.toString());
+            return asset;
+        } else {
+            //Access denied
+            return false;
         }
-        const buffer = await ctx.stub.getState(voteID_final);
-        const asset = JSON.parse(buffer.toString());
-        return asset;
     }
 
     async queryAllCandidates(ctx) {
@@ -162,6 +191,7 @@ class FabCar extends Contract {
         }
     }
 
+    //For testing
     async queryAllVote(ctx) {
         const startKey = "VOTE0";
         const endKey = "VOTE9999";
@@ -194,27 +224,32 @@ class FabCar extends Contract {
     }
 
     async countVote(ctx) {
-        let vote = 0;
-        //var temp;
+        // access has only verification server
+        let cid = new ClientIdentity(ctx.stub);
+        if (cid.assertAttributeValue("hf.EnrollmentID", "verificationServer")) {
+            let vote = 0;
+            const allVotes = JSON.parse(await this.queryAllVote(ctx));
 
-        const allVotes = JSON.parse(await this.queryAllVote(ctx));
+            // Cipfer sum of all votes
+            allVotes.forEach((element, i) => {
+                if (i !== 0) {
+                    let temp = element.Record.Vote;
+                    console.info(temp);
+                    vote = PublicKey.addition(vote, temp.toString());
+                } else {
+                    vote = element.Record.Vote;
+                }
+            });
 
-        // Cipfer sum of all votes
-        allVotes.forEach((element, i) => {
-            if (i !== 0) {
-                let temp = element.Record.Vote;
-                console.info(temp);
-                vote = PublicKey.addition(vote, temp.toString());
-            } else {
-                vote = element.Record.Vote;
-            }
-        });
+            const res = {
+                res: vote,
+            };
 
-        const res = {
-            res: vote,
-        };
-
-        return JSON.stringify(res);
+            return JSON.stringify(res);
+        } else {
+            //Access denied
+            return false;
+        }
     }
 }
 
