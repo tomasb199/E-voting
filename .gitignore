@@ -6,6 +6,7 @@
 # Dependency directories
 wallet/
 node_modules/
+package-lock.json
 
 
 # Optional npm cache directory
