@@ -30,7 +30,7 @@ This is Blockchain-Based E-voting application.
 
 - in path "/voting-app/" run:
   ```bash
-  ./initLibs.sh
+  ./installLibs.sh
   ```
   > If necessary, add script permissions. For example: "chmod 777 startVoting.sh"
 
