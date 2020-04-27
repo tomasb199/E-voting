@@ -28,29 +28,21 @@ This is Blockchain-Based E-voting application.
 
 **0. Install NodeJS libs**
 
-- in all paths: "/voting-app/server", "/voting-app/verificationServer", "/chaincode/fabcar/javascript" run:
+- in path "/voting-app/" run:
   ```bash
-  npm i
+  ./initLibs.sh
   ```
+  > If necessary, add script permissions. For example: "chmod 777 startVoting.sh"
 
-**1. Run Hyperledger Fabric**
+**1. Run Hyperledger Fabric and register servers**
 
 - in path: "/voting-app" run script:
   ```bash
   ./startVoting.sh
   ```
+  > If necessary, add script permissions. For example: "chmod 777 startVoting.sh"
 
-**2. Register Hyperledger Fabric clients (server and verification server)**
-
-- in paths: "/voting-app/server", "/voting-app/verificationServer" run scripts:
-  ```bash
-  node enrollAdmin.js
-  ```
-  ```bash
-  node registerUser.js
-  ```
-
-**3. Run all servers**
+**2. Run all servers**
 
 - in path: "/voting-app/verificationServer" run script:
   ```bash
