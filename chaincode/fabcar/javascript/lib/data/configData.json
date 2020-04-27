@@ -3,30 +3,30 @@
     "candidate": [
         {
             "ID": "1",
-            "Name": "Robert Fico",
-            "Description": "SMER-SD",
-            "Foto": "https://pbs.twimg.com/profile_images/413300240154763265/UDByF6rG_400x400.jpeg",
+            "Name": "Candidate1",
+            "Description": "Party1",
+            "Foto": "https://i.imgur.com/GpSFdo5.png",
             "Age": "55"
         },
         {
             "ID": "2",
-            "Name": "Marian Kotleba",
-            "Description": "LSNS",
-            "Foto": "https://pbs.twimg.com/profile_images/625984060788051968/YyPBiW6Y_400x400.jpg",
+            "Name": "Candidate2",
+            "Description": "Party2",
+            "Foto": "https://i.imgur.com/NlLPYjp.png",
             "Age": "88"
         },
         {
             "ID": "3",
-            "Name": "Bela Bugar",
-            "Description": "MOST-HID",
-            "Foto": "http://volby.transparency.sk/prezident2019/wp-content/uploads/sites/7/2019/02/foto_bugar_300_400.png",
+            "Name": "Candidate3",
+            "Description": "Party3",
+            "Foto": "https://i.imgur.com/VCeXa58.png",
             "Age": "60"
         },
         {
             "ID": "4",
-            "Name": "Tomas Bujna",
-            "Description": "FIIT",
-            "Foto": "https://i.imgur.com/UQihxU0.jpg",
+            "Name": "Candidate4",
+            "Description": "Party4",
+            "Foto": "https://i.imgur.com/f0Z3zcb.png",
             "Age": "24"
         }
     ]
