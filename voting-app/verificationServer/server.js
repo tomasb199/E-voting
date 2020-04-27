@@ -16,12 +16,12 @@ app.use(bodyParser.json());
 var PrivateKey = undefined;
 var voteData = undefined;
 app.use(cors()); //Cors for use 2 API
-const appAdmin = "admin";
+const appVerificationServer = "verificationServer";
 
 //Function for init voting keys
 async function init() {
   //Get from blockchain vote data
-  let networkObj = await network.connectToNetwork(appAdmin);
+  let networkObj = await network.connectToNetwork(appVerificationServer);
   response = await network.invoke(networkObj, true, "queryAllCandidates", "");
   voteData = JSON.parse(JSON.parse(response));
 
@@ -39,7 +39,7 @@ async function init() {
   };
 
   //Insert to blockchain HE Public Key
-  networkObj = await network.connectToNetwork(appAdmin);
+  networkObj = await network.connectToNetwork(appVerificationServer);
   response = await network.invoke(
     networkObj,
     false,
@@ -47,14 +47,14 @@ async function init() {
     publicKeyObj
   );
   //Insert to blockchain HE Public Key
-  networkObj = await network.connectToNetwork(appAdmin);
+  networkObj = await network.connectToNetwork(appVerificationServer);
   response = await network.invoke(networkObj, false, "sendVotingKeyBits", bits);
 }
 
 init();
 
 app.get("/getResult", async (req, res) => {
-  let networkObj = await network.connectToNetwork(appAdmin);
+  let networkObj = await network.connectToNetwork(appVerificationServer);
 
   console.time("Transaction");
   let response = await network.invoke(networkObj, true, "countVote", "");
