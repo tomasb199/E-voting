@@ -14,6 +14,7 @@ yarn-error.log*
 voting-app/demo/
 wallet/
 node_modules
+package-lock.json
 
 # Optional npm cache directory
 .npm
