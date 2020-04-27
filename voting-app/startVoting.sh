@@ -29,24 +29,23 @@ docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/g
 sleep 10
 docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp" cli peer chaincode invoke -o orderer.example.com:7050 -C mychannel -n fabcar -c '{"function":"initLedger","Args":[]}'
 
+cd ../voting-app/verificationServer && node enrollAdmin.js && node registerUser.js && cd ..
+cd server && node enrollAdmin.js && node registerUser.js
+
 cat <<EOF
 
 Total setup execution time : $(($(date +%s) - starttime)) secs ...
 
-Next, use the Voting applications to interact with the deployed Voting contract.
+The Hyperledger Fabric network has been launched.
 
-Now run the following applications to enroll the admin user, and register a new user
-called user1 which will be used by the other applications to interact with the deployed
-Voting contract:
-  node enrollAdmin
-  node registerUser
+Nodes were also registered in the network:
+  - verification server
+  - voting server
+This registration allows them to communicate from Hyperledger fabric networks.
 
-You can run the invoke application as follows. By default, the invoke application will
-create a new car, but you can update the application to submit other transactions:
-  node invoke
-
-You can run the query application as follows. By default, the query application will
-return all cars, but you can update the application to evaluate other transactions:
-  node query
+Now all you have to do is start the verification server, voting server and client:
+in path: "/voting-app/verificationServer" run script: 'npm run server'
+in path: "/voting-app/server" run script: 'npm run server'
+in path: "/voting-app/client" run script: 'npm run start'
 
 EOF
