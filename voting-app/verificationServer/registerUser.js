@@ -7,7 +7,7 @@
 const {
   FileSystemWallet,
   Gateway,
-  X509WalletMixin
+  X509WalletMixin,
 } = require("fabric-network");
 const fs = require("fs");
 const path = require("path");
@@ -22,7 +22,7 @@ const ccpPath = path.resolve(
 const ccpJSON = fs.readFileSync(ccpPath, "utf8");
 const ccp = JSON.parse(ccpJSON);
 
-const userName = "votingServer";
+const userName = "verificationServer";
 
 async function main() {
   try {
@@ -55,7 +55,7 @@ async function main() {
     await gateway.connect(ccp, {
       wallet,
       identity: "admin",
-      discovery: { enabled: false }
+      discovery: { enabled: false },
     });
 
     // Get the CA client object from the gateway for interacting with the CA.
@@ -67,13 +67,13 @@ async function main() {
       {
         affiliation: "org1.department1",
         enrollmentID: userName,
-        role: "client"
+        role: "client",
       },
       adminIdentity
     );
     const enrollment = await ca.enroll({
       enrollmentID: userName,
-      enrollmentSecret: secret
+      enrollmentSecret: secret,
     });
     const userIdentity = X509WalletMixin.createIdentity(
       "Org1MSP",
@@ -85,7 +85,7 @@ async function main() {
       `Successfully registered and enrolled admin user "${userName}" and imported it into the wallet`
     );
   } catch (error) {
-    console.error(`Failed to register user "user1": ${error}`);
+    console.error(`Failed to register user ${userName}: ${error}`);
     process.exit(1);
   }
 }
