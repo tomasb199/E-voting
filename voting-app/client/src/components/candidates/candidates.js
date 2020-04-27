@@ -19,7 +19,7 @@ import InputID from "../inputID/inputID";
 import Card from "../card/card";
 import "./candidates.css";
 
-const { encryptWithProof } = require("paillier-in-set-zkp");
+const paillier_in_set_zkp = require("../lib/paillier-with-zkp-module/index.js");
 const paillier = require("paillier-js");
 var bigInt = require("big-integer");
 
@@ -105,7 +105,7 @@ class Candidates extends Component {
       var temp = false;
       do {
         temp = false;
-        var [cipher, proof, random] = encryptWithProof(
+        var [cipher, proof, random] = paillier_in_set_zkp.encryptWithProof(
           this.state.publicKey,
           this.state.vote,
           this.state.validScores,
