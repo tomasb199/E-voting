@@ -1,3 +1,4 @@
+/*eslint-disable jsx-a11y/alt-text */
 import React, { Component } from "react";
 import { confirm } from "../confirmation/confirmation";
 import queryString from "query-string";
@@ -17,7 +18,7 @@ class AfterSign extends Component {
       isDowloaded: false,
       verifyCandidates: {},
       id: undefined,
-      isDownloadComplete: false
+      isDownloadComplete: false,
     };
   }
 
@@ -25,16 +26,16 @@ class AfterSign extends Component {
     const parameters = queryString.parse(this.props.location.search);
     const afterSignedRequestParams = {
       sessionId: parameters.sessionId,
-      documentId: parameters.documentId
+      documentId: parameters.documentId,
     };
     console.log(afterSignedRequestParams);
     const votingData = JSON.parse(localStorage.getItem("votingData"));
     console.log("Tu:", votingData);
     this.setState({
-      verifyCandidates: JSON.parse(localStorage.getItem("votingData"))
+      verifyCandidates: JSON.parse(localStorage.getItem("votingData")),
     });
 
-    if (votingData.voteType == 2) {
+    if (votingData.voteType === 2) {
       this.setState({ voteType: 2 });
     } else {
       this.setState({ voteType: 1 });
@@ -48,10 +49,10 @@ class AfterSign extends Component {
         "http://localhost:8080/voting-app/afterSign",
         afterSignedRequestParams
       )
-      .then(response => {
+      .then((response) => {
         this.setState({ loading: false });
         console.log("Result:", response.data);
-        if (response.data != false) {
+        if (response.data !== false) {
           this.setState({ isVoteSuccess: true });
           this.setState({ id: response.data });
           this.setState({ isDownloadComplete: true });
@@ -59,7 +60,7 @@ class AfterSign extends Component {
           this.setState({ isVoteSuccess: false });
         }
       })
-      .catch(error => console.error);
+      .catch((error) => console.error);
   }
 
   handleDownload = () => {
@@ -75,10 +76,10 @@ class AfterSign extends Component {
     const element = document.createElement("a");
     const finalRandom = {
       candidates: this.state.verifyCandidates,
-      id: this.state.id
+      id: this.state.id,
     };
     const file = new Blob([JSON.stringify(finalRandom).replace("\n", "")], {
-      type: "text/plain"
+      type: "text/plain",
     });
     element.href = URL.createObjectURL(file);
     element.download = "voting_file_for_verify.txt";
@@ -144,7 +145,7 @@ class AfterSign extends Component {
             {this.state.isDowloaded && (
               <Redirect
                 to={{
-                  pathname: "/verify"
+                  pathname: "/verify",
                 }}
               />
             )}

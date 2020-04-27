@@ -98,8 +98,6 @@ class VerifyParliamentaryType extends Component {
     } else {
       this.setState({ loading: true });
       setTimeout(() => {
-        const { g, n, _n2 } = this.state.publicKey;
-
         console.log("Selected party: ", this.state.selectedParty);
         const preferentialVote = this.state.candidatesID
           .map((e, i) => (e === true ? i : ""))

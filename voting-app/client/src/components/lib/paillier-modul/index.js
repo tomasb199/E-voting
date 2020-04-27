@@ -1,5 +1,7 @@
 // Root source https://github.com/juanelas/paillier-js
-"use strict";
+
+/*eslint-disable eqeqeq*/
+
 const crypto = require("crypto");
 const bigInt = require("big-integer");
 
