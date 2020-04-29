@@ -117,7 +117,7 @@ class FabCar extends Contract {
                 const zs = vote.Proof[2].map((proof) => {
                     return bigInt(proof);
                 });
-
+                console.time("verify");
                 if (
                     verifyProof(
                         PublicKey,
@@ -126,6 +126,7 @@ class FabCar extends Contract {
                         validCandidates
                     )
                 ) {
+                    console.timeEnd("verify");
                     const buffer = Buffer.from(JSON.stringify(vote));
                     await ctx.stub.putState("VOTE" + vote.id, buffer);
                     return true;
@@ -230,6 +231,7 @@ class FabCar extends Contract {
             let vote = 0;
             const allVotes = JSON.parse(await this.queryAllVote(ctx));
 
+            console.time("sum");
             // Cipfer sum of all votes
             allVotes.forEach((element, i) => {
                 if (i !== 0) {
@@ -240,7 +242,7 @@ class FabCar extends Contract {
                     vote = element.Record.Vote;
                 }
             });
-
+            console.timeEnd("sum");
             const res = {
                 res: vote,
             };
