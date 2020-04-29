@@ -103,6 +103,7 @@ class Candidates extends Component {
       console.time("encrypt");
       console.log("Vote key: ", this.state.vote);
       var temp = false;
+
       do {
         temp = false;
         var [cipher, proof, random] = paillier_in_set_zkp.encryptWithProof(
@@ -123,34 +124,43 @@ class Candidates extends Component {
       console.timeEnd("encrypt");
       this.setState({ random: random.toString() });
       this.state.random = random.toString();
-      var vote = {
-        id: this.state.id,
-        Vote: cipher,
-        Proof: proof,
-      };
-      console.log(this.state.voteName);
-      console.log(vote);
-      console.time("verify");
-      axios
-        .post("http://localhost:8000/voting-app/vote", vote)
-        .then((response) => {
-          console.log(response);
-          if (response.data === true) {
-            this.setState({ isFinish: true });
-            this.state.isFinish = true;
+      //Loop for send many votes for test
+      for (let i = 0; i < 1; i++) {
+        var vote = {
+          id: Number(Number(this.state.id) + i).toString(),
+          Vote: cipher,
+          Proof: proof,
+        };
+        console.log(this.state.voteName);
+        console.log(vote);
+        console.time("verify");
+        axios
+          .post("http://localhost:8000/voting-app/vote", vote)
+          .then((response) => {
+            console.log(response);
+            if (response.data === true) {
+              this.setState({ isFinish: true });
+              this.state.isFinish = true;
+              this.setState({ loading: false });
+              NotificationManager.success(
+                "Your vote is counted :-)",
+                "SUCCESS!"
+              );
+              console.timeEnd("verify");
+            } else {
+              NotificationManager.error(
+                "Your vote is not counted :-(",
+                "ERROR!"
+              );
+              this.setState({ loading: false });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            NotificationManager.error("Faild :-(", "ERROR!");
             this.setState({ loading: false });
-            NotificationManager.success("Your vote is counted :-)", "SUCCESS!");
-            console.timeEnd("verify");
-          } else {
-            NotificationManager.error("Your vote is not counted :-(", "ERROR!");
-            this.setState({ loading: false });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          NotificationManager.error("Faild :-(", "ERROR!");
-          this.setState({ loading: false });
-        });
+          });
+      }
     });
   };
 
