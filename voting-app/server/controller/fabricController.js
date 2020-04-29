@@ -1,8 +1,14 @@
 let network = require("../fabric/network");
+const fs = require("fs");
 const util = require("util");
+
+const { performance } = require("perf_hooks");
 
 //use this identity to query
 const userName = "votingServer";
+let saveTimeArr = [];
+let saveSumTime = [];
+let sumTime = 0;
 
 module.exports = {
   candidates: async (req, res) => {
@@ -33,10 +39,21 @@ module.exports = {
   },
 
   vote: async (req, res) => {
+    var t0 = performance.now();
     let networkObj = await network.connectToNetwork(userName);
     let response = await network.invoke(networkObj, false, "createVote", [
-      req.body
+      req.body,
     ]);
+    var t1 = performance.now();
+    sumTime += t1 - t0;
+    saveTimeArr.push(t1 - t0);
+    saveSumTime.push(sumTime);
+    fs.writeFile("performanceOut.txt", JSON.stringify(saveSumTime), function (
+      err
+    ) {
+      if (err) return console.log(err);
+      console.log("Hello World > helloworld.txt");
+    });
     if (response.error) {
       res.send(response.error);
     } else {
@@ -55,5 +72,5 @@ module.exports = {
     );
     let parsedResponse = await JSON.parse(response);
     res.send(parsedResponse);
-  }
+  },
 };

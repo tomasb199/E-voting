@@ -4,6 +4,12 @@ const cors = require("cors");
 const paillier = require("paillier-bignum");
 let r = require("jsrsasign");
 let network = require("./fabric/network");
+const fs = require("fs");
+const { performance } = require("perf_hooks");
+
+let saveTimeArr = [];
+let timeSum = 0;
+let saveSumTime = [];
 
 const port = 5000;
 const bits = 2048;
@@ -114,6 +120,7 @@ app.post("/verifyVote", (req, res) => {
       let result = 0;
 
       console.time("Verify");
+      var t0 = performance.now();
       for (let i = 0; i < vote.length; i++) {
         //If there are no votes attribute
         if (!vote[i].hasOwnProperty("vote")) {
@@ -131,6 +138,19 @@ app.post("/verifyVote", (req, res) => {
         //I count all votes
         sum += Number(result);
       }
+      var t1 = performance.now();
+      timeSum += t1 - t0;
+      console.log("timeSum");
+      saveTimeArr.push(timeSum);
+      saveSumTime.push(timeSum);
+      fs.writeFile(
+        "performanceOut.txt",
+        JSON.stringify(saveSumTime), //JSON.stringify(saveTimeArr),
+        function (err) {
+          if (err) return console.log(err);
+          console.log("Hello World > helloworld.txt");
+        }
+      );
       console.timeEnd("Verify");
       // If vote is correct sign
       if (sum === 1 || sum === 0) {
