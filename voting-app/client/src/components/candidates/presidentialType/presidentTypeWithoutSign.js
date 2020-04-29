@@ -103,53 +103,58 @@ class Candidates extends Component {
       console.log("Data to sign: ", voteData);
       //Verify vote first
       console.time("verify");
-      axios
-        .post("http://localhost:5000/verifyVote", voteData)
-        .then((response) => {
-          console.timeEnd("verify");
-          if (response.data !== false) {
-            NotificationManager.success(
-              "Your vote was success signed :-)",
-              "SUCCESS!"
-            );
-            const finalVote = response.data;
-            finalVote.id = this.state.id;
-            console.time("sendVote");
-            //Then send signed vote
-            axios
-              .post("http://localhost:8000/voting-app/vote", finalVote)
-              .then((response) => {
-                console.timeEnd("sendVote");
-                console.log("Final Vote:", finalVote);
-                if (response.data === true) {
-                  this.setState({ isFinish: true });
-                  this.state.isFinish = true;
-                  NotificationManager.success(
-                    "Your vote is counted :-)",
-                    "SUCCESS!"
-                  );
-                  this.setState({ loading: false });
-                } else {
-                  NotificationManager.error(
-                    "Your vote is not counted :-(",
-                    "ERROR!"
-                  );
-                  this.setState({ loading: false });
-                }
-              });
-          } else {
-            NotificationManager.error(
-              "Your vote is not sign from VS :-(",
-              "ERROR!"
-            );
+      for (let i = 0; i < 1; i++) {
+        axios
+          .post("http://localhost:5000/verifyVote", voteData)
+          .then((response) => {
+            console.timeEnd("verify");
+            if (response.data !== false) {
+              NotificationManager.success(
+                "Your vote was success signed :-)",
+                "SUCCESS!"
+              );
+
+              const finalVote = response.data;
+              let temp = parseInt(this.state.id) + i;
+              finalVote.id = temp.toString();
+              console.log("test: ", finalVote.id);
+              console.time("send");
+              //Then send signed vote
+              axios
+                .post("http://localhost:8000/voting-app/vote", finalVote)
+                .then((response) => {
+                  console.timeEnd("send");
+                  console.log("Final Vote:", finalVote);
+                  if (response.data === true) {
+                    this.setState({ isFinish: true });
+                    this.state.isFinish = true;
+                    NotificationManager.success(
+                      "Your vote is counted :-)",
+                      "SUCCESS!"
+                    );
+                    this.setState({ loading: false });
+                  } else {
+                    NotificationManager.error(
+                      "Your vote is not counted :-(",
+                      "ERROR!"
+                    );
+                    this.setState({ loading: false });
+                  }
+                });
+            } else {
+              NotificationManager.error(
+                "Your vote is not sign from VS :-(",
+                "ERROR!"
+              );
+              this.setState({ loading: false });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            NotificationManager.error("Faild :-(", "ERROR!");
             this.setState({ loading: false });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          NotificationManager.error("Faild :-(", "ERROR!");
-          this.setState({ loading: false });
-        });
+          });
+      }
     });
   };
 
