@@ -7,6 +7,9 @@
 # Exit on first error
 set -e
 
+docker rm -f $(docker ps -aq)
+docker rmi -f $(docker images | grep fabcar | awk '{print $3}')
+
 # don't rewrite paths for Windows Git Bash users
 export MSYS_NO_PATHCONV=1
 starttime=$(date +%s)
