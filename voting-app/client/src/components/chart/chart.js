@@ -18,44 +18,46 @@ class ChartsPage extends Component {
       selectParty: undefined,
       preferentialVotes: [],
       currentPreferentialVotesObj: {},
-      selectedPartyIndex: undefined
+      selectedPartyIndex: undefined,
     };
   }
 
   async componentDidMount() {
     axios
       .get("http://localhost:8000/voting-app/candidates/")
-      .then(response => response.data)
-      .then(voteData => {
+      .then((response) => response.data)
+      .then((voteData) => {
         this.setState({ voteType: voteData.voteType });
         this.setState({ voteData });
         console.time("decrypt");
         axios
           .get("http://localhost:5000/getResult")
-          .then(response => response.data)
-          .then(result => {
+          .then((response) => response.data)
+          .then((result) => {
             console.timeEnd("decrypt");
             if (result === false) {
               this.setState({ loading: false });
               console.log("Result:", result);
               return;
             }
-            result.decryptVotingResult.sort(function(a, b) {
+            result.decryptVotingResult.sort(function (a, b) {
               return -(a.res - b.res || a.name.localeCompare(b.name));
             });
-            const resultNumbers = result.decryptVotingResult.map(candidate => {
-              return candidate.res;
-            });
+            const resultNumbers = result.decryptVotingResult.map(
+              (candidate) => {
+                return candidate.res;
+              }
+            );
             this.setState({ resultNumbers });
 
             const sum = resultNumbers.reduce((a, b) => Number(a) + Number(b));
-            const resultNumbersPercent = resultNumbers.map(item => {
+            const resultNumbersPercent = resultNumbers.map((item) => {
               return ((100 * Number(item)) / sum).toFixed(2);
             });
             console.log(resultNumbersPercent);
             this.setState({ resultNumbersPercent });
 
-            const resultNames = result.decryptVotingResult.map(candidate => {
+            const resultNames = result.decryptVotingResult.map((candidate) => {
               return candidate.name;
             });
             this.setState({ resultNames });
@@ -71,30 +73,32 @@ class ChartsPage extends Component {
       });
   }
 
-  selectParty = input => {
+  selectParty = (input) => {
     axios
       .get("http://localhost:8000/voting-app/candidates/")
-      .then(response => response.data)
-      .then(voteData => {
+      .then((response) => response.data)
+      .then((voteData) => {
         this.setState({ voteType: voteData.voteType });
         this.setState({ voteData });
         axios
           .get("http://localhost:5000/getResult")
-          .then(response => response.data)
-          .then(result => {
+          .then((response) => response.data)
+          .then((result) => {
             if (result === false) {
               this.setState({ loading: false });
               console.log("Result:", result);
               return;
             }
-            result.decryptVotingResult.sort(function(a, b) {
+            result.decryptVotingResult.sort(function (a, b) {
               return -(a.res - b.res || a.name.localeCompare(b.name));
             });
-            const resultNumbers = result.decryptVotingResult.map(candidate => {
-              return candidate.res;
-            });
+            const resultNumbers = result.decryptVotingResult.map(
+              (candidate) => {
+                return candidate.res;
+              }
+            );
             this.setState({ resultNumbers });
-            const resultNames = result.decryptVotingResult.map(candidate => {
+            const resultNames = result.decryptVotingResult.map((candidate) => {
               return candidate.name;
             });
             this.setState({ resultNames });
@@ -110,9 +114,9 @@ class ChartsPage extends Component {
       });
 
     const selectedPartyObj = this.state.voteData.candidate.find(
-      e => e.Party === input
+      (e) => e.Party === input
     );
-    const currentLabels = selectedPartyObj.Candidates.map(c => {
+    const currentLabels = selectedPartyObj.Candidates.map((c) => {
       return c.Name;
     });
     const data = {
@@ -125,9 +129,9 @@ class ChartsPage extends Component {
           borderWidth: 1,
           hoverBackgroundColor: "rgba(255,99,132,0.4)",
           hoverBorderColor: "rgba(255,99,132,1)",
-          data: this.state.preferentialVotes.find(v => v.name === input).res
-        }
-      ]
+          data: this.state.preferentialVotes.find((v) => v.name === input).res,
+        },
+      ],
     };
     this.setState({ currentPreferentialVotesObj: data });
     this.setState({ selectParty: input });
@@ -146,7 +150,7 @@ class ChartsPage extends Component {
               "rgba(255, 218, 128,0.4)",
               "rgba(113, 205, 205,0.4)",
               "rgba(170, 128, 252,0.4)",
-              "rgba(255, 177, 101,0.4)"
+              "rgba(255, 177, 101,0.4)",
             ],
             borderWidth: 2,
             borderColor: [
@@ -155,10 +159,10 @@ class ChartsPage extends Component {
               "rgba(255, 218, 128, 1)",
               "rgba(113, 205, 205, 1)",
               "rgba(170, 128, 252, 1)",
-              "rgba(255, 177, 101, 1)"
-            ]
-          }
-        ]
+              "rgba(255, 177, 101, 1)",
+            ],
+          },
+        ],
       },
       dataPie = {
         labels: this.state.resultNames,
@@ -171,7 +175,7 @@ class ChartsPage extends Component {
               "rgba(255, 218, 128,0.4)",
               "rgba(113, 205, 205,0.4)",
               "rgba(170, 128, 252,0.4)",
-              "rgba(255, 177, 101,0.4)"
+              "rgba(255, 177, 101,0.4)",
             ],
             borderColor: [
               "rgba(255, 134, 159, 1)",
@@ -179,10 +183,10 @@ class ChartsPage extends Component {
               "rgba(255, 218, 128, 1)",
               "rgba(113, 205, 205, 1)",
               "rgba(170, 128, 252, 1)",
-              "rgba(255, 177, 101, 1)"
-            ]
-          }
-        ]
+              "rgba(255, 177, 101, 1)",
+            ],
+          },
+        ],
       },
       barChartOptions = {
         responsive: true,
@@ -193,25 +197,26 @@ class ChartsPage extends Component {
               barPercentage: 1,
               gridLines: {
                 display: false,
-                color: "rgba(0, 0, 0, 0.1)"
+                color: "rgba(0, 0, 0, 0.1)",
               },
               ticks: {
-                precision: 0
-              }
-            }
+                precision: 0,
+              },
+            },
           ],
           yAxes: [
             {
               gridLines: {
                 display: true,
-                color: "rgba(0, 0, 0, 0.1)"
+                color: "rgba(0, 0, 0, 0.1)",
               },
               ticks: {
-                precision: 0
-              }
-            }
-          ]
-        }
+                eginAtZero: true,
+                precision: 0,
+              },
+            },
+          ],
+        },
       };
 
     return (
@@ -224,7 +229,7 @@ class ChartsPage extends Component {
                 <Bar
                   data={dataBar}
                   options={barChartOptions}
-                  getElementsAtEvent={elems => {
+                  getElementsAtEvent={(elems) => {
                     if (this.state.voteType === 2) {
                       this.selectParty(this.state.resultNames[elems[0]._index]);
                     }
