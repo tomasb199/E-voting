@@ -23,7 +23,7 @@ async function init() {
   //Get from blockchain vote data
   let networkObj = await network.connectToNetwork(appVerificationServer);
   response = await network.invoke(networkObj, true, "queryAllCandidates", "");
-  voteData = JSON.parse(JSON.parse(response));
+  voteData = JSON.parse(response);
 
   console.log(voteData);
 
@@ -59,7 +59,7 @@ app.get("/getResult", async (req, res) => {
   console.time("Transaction");
   let response = await network.invoke(networkObj, true, "countVote", "");
   console.timeEnd("Transaction");
-  const pom = JSON.parse(JSON.parse(response));
+  const pom = JSON.parse(response);
   console.time("Decrypt");
   // Decrypt sum of all votes
   const sum = PrivateKey.decrypt(bigInt(pom.res));
