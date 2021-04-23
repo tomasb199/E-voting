@@ -9,7 +9,7 @@
 const shim = require("fabric-shim");
 const { Contract } = require("fabric-contract-api");
 const ClientIdentity = require("fabric-shim").ClientIdentity;
-const { verifyProof } = require("paillier-in-set-zkp");
+const { verifyProof } = require("../myLib/zkpVerifyProof");
 const paillier = require("paillier-js");
 var bigInt = require("big-integer");
 const path = require("path");
@@ -18,7 +18,7 @@ const fs = require("fs");
 let PublicKey = undefined;
 let validCandidates;
 var bit = undefined;
-let sizeElectionDistrict = 1000;
+let sizeElectionDistrict = 100;
 
 // connect to the pres election file
 const ballotDataPath = path.join(process.cwd(), "./data/configData.json");
