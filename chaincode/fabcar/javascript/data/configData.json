@@ -26,5 +26,47 @@
         "Description": "Party4",
         "Foto": "https://i.imgur.com/f0Z3zcb.png",
         "Age": "24"
+    },
+    {
+        "ID": "5",
+        "Name": "Candidate5",
+        "Description": "Party5",
+        "Foto": "https://i.imgur.com/GpSFdo5.png",
+        "Age": "55"
+    },
+    {
+        "ID": "6",
+        "Name": "Candidate6",
+        "Description": "Party6",
+        "Foto": "https://i.imgur.com/NlLPYjp.png",
+        "Age": "88"
+    },
+    {
+        "ID": "7",
+        "Name": "Candidate7",
+        "Description": "Party7",
+        "Foto": "https://i.imgur.com/VCeXa58.png",
+        "Age": "60"
+    },
+    {
+        "ID": "8",
+        "Name": "Candidate8",
+        "Description": "Party8",
+        "Foto": "https://i.imgur.com/f0Z3zcb.png",
+        "Age": "24"
+    },
+    {
+        "ID": "9",
+        "Name": "Candidate9",
+        "Description": "Party9",
+        "Foto": "https://i.imgur.com/GpSFdo5.png",
+        "Age": "55"
+    },
+    {
+        "ID": "10",
+        "Name": "Candidate10",
+        "Description": "Party10",
+        "Foto": "https://i.imgur.com/NlLPYjp.png",
+        "Age": "88"
     }
 ]
